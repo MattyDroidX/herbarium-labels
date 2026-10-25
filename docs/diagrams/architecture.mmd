@@ -1,0 +1,19 @@
+flowchart LR
+    Input["Original images: unchanged"] --> CLI["CLI: transcribe / batch"]
+    CLI --> Bryophytes["bryophytes.py: prepare and validate"]
+    Bryophytes --> Cache["cache.py: content/config hashes and output lock"]
+    Cache --> Provider["Claude provider: live calls only outside demo"]
+    Provider --> Reading["BryophyteReading: English fields"]
+    Reading --> JSON["Atomic JSON persistence"]
+    JSON --> Report["CLI report: offline Excel / PDF"]
+    Legacy["legacy.py: read old JSON in memory"] --> Report
+    Report --> ZIP["batch: checked ZIP with relative image links"]
+    Report --> Human["Human review outside the library"]
+    Input --> Sheets["Python API: sennen.read_labels"]
+    Sheets --> Crop["Full sheet plus lower crop"]
+    Crop --> Provider
+    Provider --> SheetReading["SheetReading: labels remain separate"]
+    SheetReading --> Host["Host application review; no database writes"]
+    Demo["CLI demo: synthetic images and simulated provider"] --> Bryophytes
+    Demo --> Sheets
+    Catalog["catalog.py and library/: documentary validation only"]

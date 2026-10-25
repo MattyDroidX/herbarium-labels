@@ -1,0 +1,18 @@
+{
+  "provider": "simulated; no network or paid requests",
+  "checks": {
+    "original_unchanged": true,
+    "english_json": true,
+    "literal_preserved": true,
+    "english_workbook_sheets": true,
+    "formula_like_text_is_safe": true,
+    "image_link_exists": true,
+    "extracted_image_link_exists": true,
+    "zip_valid": true,
+    "cache_reused_without_call": true,
+    "sheet_labels_separate": true,
+    "pdf_generated": true
+  },
+  "all_passed": true,
+  "simulated_calls": 2
+}

@@ -1,0 +1,25 @@
+include LICENSE NOTICE.md README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
+include AGENTS.md HANDOFF.md PLAN.md VALIDATION.md
+include pyproject.toml MANIFEST.in MANIFEST.sha256
+include requirements.lock requirements-dev.in requirements-dev.lock
+include .env.example .gitignore
+recursive-include src/herbarium_labels *.py
+recursive-include tests *.py
+recursive-include tools *.py
+recursive-include docs *.md *.mmd *.svg
+recursive-include library *.json
+recursive-include .github/workflows *.yml
+global-exclude *.pyc *.pyo *.partial
+prune .venv
+prune .git
+prune build
+prune dist
+prune data
+prune runs
+prune transcription
+# Exclude legacy delivery directories as well.
+prune transcricao
+
+# Public synthetic demonstration assets only.
+recursive-include examples/synthetic *.md *.jpg *.png *.pdf *.xlsx *.json
+prune review

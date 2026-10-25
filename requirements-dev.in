@@ -1,0 +1,6 @@
+# Release validation tools; these are not runtime dependencies.
+build>=1.2,<2
+twine>=6,<7
+pip-audit>=2.9,<3
+PyYAML>=6,<7
+setuptools>=77,<100

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "herbarium-labels"
+version = "0.1.0a2"
+description = "Botanical label transcription and documented historical handwriting profiles"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md"]
+keywords = ["herbarium", "botany", "transcription", "natural-history", "handwriting"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = ["Pillow>=13,<14", "pydantic>=2.11,<3"]
+
+[project.optional-dependencies]
+claude = ["anthropic>=1.17,<2"]
+reports = ["openpyxl>=3.1.5,<4", "reportlab>=4.4,<5"]
+heif = ["pillow-heif>=1.1.1,<2"]
+all = ["anthropic>=1.17,<2", "openpyxl>=3.1.5,<4", "reportlab>=4.4,<5", "pillow-heif>=1.1.1,<2"]
+
+[project.scripts]
+herbarium-labels = "herbarium_labels.bryophytes:main"
+
+[project.urls]
+Repository = "https://github.com/MattyDroidX/herbarium-labels"
+Issues = "https://github.com/MattyDroidX/herbarium-labels/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]

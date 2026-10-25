@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.2.0",
+  "persons": [
+    {
+      "person_id": "goncalo-sampaio",
+      "display_name": "Gonçalo Sampaio",
+      "aliases": [],
+      "documented_roles": [],
+      "source_ids": [],
+      "status": "draft"
+    },
+    {
+      "person_id": "frere-sennen",
+      "display_name": "Frère Sennen",
+      "aliases": [],
+      "documented_roles": [],
+      "source_ids": [],
+      "status": "draft"
+    },
+    {
+      "person_id": "carlos-zimmermann",
+      "display_name": "Carlos Zimmermann",
+      "aliases": [],
+      "documented_roles": [],
+      "source_ids": [],
+      "status": "draft"
+    },
+    {
+      "person_id": "alphonse-luisier",
+      "display_name": "Alphonse Luisier",
+      "aliases": [],
+      "documented_roles": [],
+      "source_ids": [],
+      "status": "draft"
+    }
+  ],
+  "sources": [],
+  "samples": [],
+  "attributions": []
+}

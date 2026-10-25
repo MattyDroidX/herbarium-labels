@@ -1,0 +1,257 @@
+{
+  "$defs": {
+    "HandAttribution": {
+      "additionalProperties": false,
+      "properties": {
+        "attribution_id": {
+          "minLength": 1,
+          "title": "Attribution Id",
+          "type": "string"
+        },
+        "hand_id": {
+          "minLength": 1,
+          "title": "Hand Id",
+          "type": "string"
+        },
+        "person_id": {
+          "minLength": 1,
+          "title": "Person Id",
+          "type": "string"
+        },
+        "status": {
+          "default": "candidate",
+          "enum": [
+            "candidate",
+            "confirmed",
+            "contested"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "sample_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sample Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "evidence": {
+          "default": "",
+          "title": "Evidence",
+          "type": "string"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        }
+      },
+      "required": [
+        "attribution_id",
+        "hand_id",
+        "person_id"
+      ],
+      "title": "HandAttribution",
+      "type": "object"
+    },
+    "HandSample": {
+      "additionalProperties": false,
+      "properties": {
+        "sample_id": {
+          "minLength": 1,
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "hand_id": {
+          "minLength": 1,
+          "title": "Hand Id",
+          "type": "string"
+        },
+        "image_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Image Sha256",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "literal_text": {
+          "title": "Literal Text",
+          "type": "string"
+        },
+        "local_use_allowed": {
+          "default": false,
+          "title": "Local Use Allowed",
+          "type": "boolean"
+        },
+        "api_use_allowed": {
+          "default": false,
+          "title": "Api Use Allowed",
+          "type": "boolean"
+        },
+        "redistribution_allowed": {
+          "default": false,
+          "title": "Redistribution Allowed",
+          "type": "boolean"
+        },
+        "rights_statement": {
+          "minLength": 1,
+          "title": "Rights Statement",
+          "type": "string"
+        },
+        "reviewed_by": {
+          "minLength": 1,
+          "title": "Reviewed By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "hand_id",
+        "image_sha256",
+        "source_ids",
+        "literal_text",
+        "rights_statement",
+        "reviewed_by"
+      ],
+      "title": "HandSample",
+      "type": "object"
+    },
+    "Person": {
+      "additionalProperties": false,
+      "properties": {
+        "person_id": {
+          "minLength": 1,
+          "title": "Person Id",
+          "type": "string"
+        },
+        "display_name": {
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "documented_roles": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Documented Roles",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "default": "draft",
+          "enum": [
+            "draft",
+            "reviewed"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "person_id",
+        "display_name"
+      ],
+      "title": "Person",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "citation": {
+          "minLength": 1,
+          "title": "Citation",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "citation",
+        "locator"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0",
+      "default": "0.2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "persons": {
+      "items": {
+        "$ref": "#/$defs/Person"
+      },
+      "title": "Persons",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "samples": {
+      "items": {
+        "$ref": "#/$defs/HandSample"
+      },
+      "title": "Samples",
+      "type": "array"
+    },
+    "attributions": {
+      "items": {
+        "$ref": "#/$defs/HandAttribution"
+      },
+      "title": "Attributions",
+      "type": "array"
+    }
+  },
+  "title": "Catalog",
+  "type": "object"
+}

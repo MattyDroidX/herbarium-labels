@@ -1,0 +1,29 @@
+{
+  "reading": {
+    "labels": [
+      {
+        "origin": "Sennen",
+        "literal_text": "SYNTHETIC LABEL A"
+      },
+      {
+        "origin": "Porto",
+        "literal_text": "SYNTHETIC LABEL B"
+      }
+    ],
+    "general_accession_number": "",
+    "order_number": "",
+    "sennen_exsiccata_number": "",
+    "shelfmark": "",
+    "sennen_label_name": "",
+    "porto_label_name": "",
+    "locality": "",
+    "altitude": "",
+    "collection_date": "",
+    "collector": "",
+    "uncertainties": []
+  },
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 20
+  }
+}

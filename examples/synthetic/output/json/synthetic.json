@@ -1,0 +1,36 @@
+{
+  "schema_version": "0.2.0",
+  "filename": "synthetic.jpg",
+  "model": "offline-demo",
+  "elapsed_seconds": 0.0,
+  "input_tokens": 10,
+  "output_tokens": 20,
+  "cache": {
+    "version": 1,
+    "image_sha256": "2a605e637d402bc44d4f8117ea514ba012f99f24bba1795b64d96ddef69de056",
+    "configuration_sha256": "bcd6852f5cd50c3b16efd6806a5e6cb458b3430c273cc003bbd605ea82fabba9"
+  },
+  "reading": {
+    "rotation_degrees": 0,
+    "herbarium": "Synthetic collection",
+    "collection_series": "",
+    "name_as_written": "",
+    "species": "Sphagnum palustre",
+    "taxonomic_author": "L.",
+    "determiner": "",
+    "country_province": "",
+    "locality": "",
+    "ecology": "",
+    "altitude": "",
+    "utm": "",
+    "date_as_written": "15/3/1993",
+    "date_iso": "1993-03-15",
+    "collector": "Example collector",
+    "collection_number": "001",
+    "handwritten_notes": "",
+    "literal_text": "= SYNTHETIC LABEL - NOT A SPECIMEN\nSphagnum palustre L.\nLeg. Example collector    No. 001\nDate 15/3/1993",
+    "uncertainties": [
+      "Synthetic uncertainty for review."
+    ]
+  }
+}
