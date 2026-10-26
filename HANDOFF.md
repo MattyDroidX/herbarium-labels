@@ -39,3 +39,11 @@ Review the patch and validation record. Apply only to the matching baseline, rer
 Remaining work includes authorized live evaluation with a defined budget, long/Unicode report coverage, real HEIF samples, curated handwriting sources/examples, review import, and the broader roadmap in PLAN.md. No paid service call is included in this proposal.
 
 The separately hashed `requirements-compat.lock` selects Pillow 11.3 for functional compatibility checks; `requirements.lock` remains the recommended current environment.
+
+## Windows CI fixture correction
+
+The maintainer pushed commit `904bb46`. In run [40374862961](https://github.com/MattyDroidX/herbarium-labels/actions/runs/40374862961), Ubuntu/Python 3.11–3.14, Pillow compatibility, and distribution jobs succeeded. Windows/Python 3.11–3.14 all failed in the same legacy-Portuguese JSON test. Its fixture used locale-default encoding with `ensure_ascii=False`, producing CP1252 bytes that the UTF-8 JSON reader correctly rejected.
+
+An isolated test-only proposal specifies UTF-8 in the fixture/helper and simulates CP1252 fallback inside the existing regression. Runtime JSON handling, scientific contracts, workflows, Dependabot configuration, and dependency pins are unchanged. The original failure was reproduced locally with CP1252 file-I/O defaults. The maintainer must apply/commit/push the fix and verify the real Windows rerun before tagging 0.1.0a3. No native Windows rerun is claimed during patch preparation.
+
+Dependabot was introduced to propose monthly GitHub Actions updates for SHA-pinned dependencies; no automerge workflow was configured. Its four major-update PRs remain separate review work. The workflow listens to both push and pull_request, explaining duplicate runs for internal PR branches.

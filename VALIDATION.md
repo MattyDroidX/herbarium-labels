@@ -118,3 +118,11 @@ No live Anthropic call, paleographic comparison of translated prompts, real HEIF
 Known behavior remains: duplicate filename stems are rejected; IDs/manifests/deduplication and native review events/import are future work. Standalone reports do not acquire a transcription lock. Inspect transcribe's failure summary; per-image failures do not always imply a nonzero command status. Batch refuses incomplete delivery. Lost responses may require repeat paid requests.
 
 No working-tree or Git mutation occurred during this English-code continuation. No assistant apply, commit, tag, push, TestPyPI upload, or PyPI upload occurred. Publication commands are for the maintainer after review/application, using [PUBLISHING.md](docs/PUBLISHING.md).
+
+## Observed remote CI and Windows fixture proposal — 2026-10-26
+
+Read-only inspection of [run 40374862961](https://github.com/MattyDroidX/herbarium-labels/actions/runs/40374862961) for commit `904bb460f16ef0ee615f6d76352b75314695a7bf` confirmed six successful jobs: Ubuntu Python 3.11–3.14, Pillow compatibility, and distribution including installed-wheel tests. All four Windows Python 3.11–3.14 jobs failed on `test_old_portuguese_envelope_is_reused_without_rewriting_keys`.
+
+The test generated accented JSON without specifying an encoding. A local reproduction with CP1252 Path read/write defaults failed at the same acceptance-validation step. The proposal writes those fixtures as UTF-8 and makes the existing regression exercise CP1252 fallback, preserving the byte-for-byte reading assertion. The full 84-test suite passed locally with simulated CP1252 file defaults after the fix. This reproduces the encoding condition; it is not a native Windows execution. The real Windows matrix must be rerun by the maintainer's push.
+
+No production module, scientific prompt/schema, JSON decoding policy, workflow, Dependabot configuration, dependency, private data, or published version was changed by this correction. The assistant did not merge/rebase/close any Dependabot PR, rerun remote workflows, commit, or push.

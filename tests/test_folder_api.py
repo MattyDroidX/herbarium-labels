@@ -46,7 +46,7 @@ def legacy_folder(*, cached=True):
         output = images / 'transcription'
         (output / 'json').mkdir(parents=True)
         target = output / 'json/old.json'
-        target.write_text(json.dumps(old_record(image, cached=cached), ensure_ascii=False))
+        target.write_text(json.dumps(old_record(image, cached=cached), ensure_ascii=False), encoding='utf-8')
         yield images, output, image, target
 
 
@@ -284,11 +284,20 @@ class ExistingReadingTests(unittest.TestCase):
 
     def test_old_portuguese_envelope_is_reused_without_rewriting_keys(self):
         from test_english_api import legacy_reading
-        with legacy_folder(cached=False) as (images, output, image, target):
+        write_text = Path.write_text
+
+        def windows_default_write(path, data, encoding=None, errors=None, newline=None):
+            # Keep this regression effective even on hosts whose locale is UTF-8.
+            return write_text(path, data, encoding=encoding or 'cp1252', errors=errors, newline=newline)
+
+        with patch.object(Path, 'write_text', windows_default_write), \
+                legacy_folder(cached=False) as (images, output, image, target):
             item = {'ficheiro': image.name, 'modelo': 'historical', 'input_tokens': 1,
                     'output_tokens': 2, 'leitura': legacy_reading()}
-            target.write_text(json.dumps(item, ensure_ascii=False))
+            payload = json.dumps(item, ensure_ascii=False)
+            target.write_text(payload, encoding='utf-8')
             before = target.read_bytes()
+            self.assertEqual(before, payload.encode('utf-8'))
             self.assertEqual(transcribe_folder(images, output, profile='po-bryophytes', accept_existing=True).reused, 1)
             self.assertEqual(target.read_bytes(), before)
             create_report(images, output, profile='po-bryophytes', include_pdf=False)

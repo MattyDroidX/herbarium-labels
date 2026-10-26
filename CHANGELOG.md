@@ -2,6 +2,8 @@
 
 ## Unreleased — 0.1.0a3
 
+- Write non-ASCII JSON fixtures explicitly as UTF-8 and exercise the legacy-reading test under simulated CP1252 defaults, fixing the Windows CI failure without changing runtime readers.
+
 - Document batch price precedence (`prices` > `options.prices` > environment) consistently for transcription and reports, with a regression test. Add explicit legacy `transcricao/` continuation examples.
 
 - Add public path-based `transcribe_folder`, `create_report`, and `batch_folder` APIs with artifact return values; the CLI calls these directly. Existing namespace adapters remain compatible.
