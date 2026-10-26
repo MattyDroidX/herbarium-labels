@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "herbarium-labels"
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Botanical label transcription and documented historical handwriting profiles"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE.md"]
-keywords = ["herbarium", "botany", "transcription", "natural-history", "handwriting"]
+keywords = ["herbarium", "botany", "transcription", "natural-history", "handwriting",
+    "herbário", "herbario", "etiquetas", "exsicatas", "transcrição", "transcripción", "briófitas", "briofitas"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -42,3 +43,6 @@ Issues = "https://github.com/MattyDroidX/herbarium-labels/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+herbarium_labels = ["locales/*.json"]

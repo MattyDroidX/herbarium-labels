@@ -1,6 +1,8 @@
 # Host integration contracts
 
-These interfaces target the unreleased 0.1.0a3 proposal. Install the reviewed source or wheel before using them. The published 0.1.0a2 does not expose these options.
+These interfaces describe the 0.1.0a4 release candidate. The preceding 0.1.0a3 alpha is published; notes-language selection and bundled catalogues first appear in 0.1.0a4. Install the reviewed candidate source/wheel during preparation, and pin `herbarium-labels==0.1.0a4` after release. Do not use a floating alpha range in a consuming application.
+
+The supported API and one-preceding-alpha notice policy for incompatible changes/removal are defined in the [README](../README.md#public-api-and-compatibility). Other implementation helpers remain internal.
 
 ## Canonical fields and host fields
 
@@ -21,6 +23,38 @@ rows = suggestions(
 
 Supported canonical keys are `transcription`, `shelfmark`, `exsiccata_number`, `collection_date`, and `original_locality`. Unspecified keys map to themselves. Unknown keys, empty host names, and collisions raise `ValueError`. Values are suggestions, never database updates.
 
+## Taxa integration with Portuguese notes and review messages
+
+```python
+from herbarium_labels import TranscriptionOptions, load_messages, read_image
+from herbarium_labels.sennen import suggestions
+
+options = TranscriptionOptions(model=selected_model, notes_language="pt")
+reading, usage = read_image(
+    image_bytes, profile="sennen", client=existing_client, options=options,
+)
+rows = suggestions(
+    record, reading, filename,
+    options=options,
+    messages=load_messages("pt", kind="review"),
+    field_map={"shelfmark": "cota"},
+)
+```
+
+The injected client remains caller-owned. This changes only generated uncertainty notes and review presentation; source text is not translated. Adjust templates with a mapping/callback if the host needs its existing exact wording.
+
+Taxa adoption is a separate Taxa release after 0.1.0a4 is published and verified. Only then replace its `app/transcription.py`, pin the exact package version in Taxa's `requirements.txt`, and move the maintainer's current equivalence cases into Taxa's own suite. Require exact suggested values and review text for shelfmark spacing, Roman-numeral dates, and uncertainties before rollout. The bundled catalogue alone is not evidence of identical wording to a private host catalogue. No Taxa code, deployment, or research data is changed by this package proposal.
+
+## Model uncertainty language
+
+`TranscriptionOptions(notes_language=None)` preserves the complete 0.1.0a3 prompt and cache identity byte for byte under identical model/schema/dependency/image settings. Accepted values are `None`, `"en"`, `"pt"`, and `"es"`; other values raise `ValueError` at construction.
+
+A selected language appends one shared instruction to the profile prompt: write only `uncertainties` entries in that language, without translating or normalizing `literal_text`, `labels`, `name_as_written`, `handwritten_notes`, or other transcribed fields. The same rule applies to installed/external profiles. Base profile prompts and reading schemas are unchanged. This is a model instruction; offline tests validate the request contract, not live linguistic compliance or scientific accuracy.
+
+The effective prompt is hashed in the cache configuration. Each explicit language has a different identity, including explicit English versus `None`. New folder JSON records `notes_language` in the envelope, outside the scientific `reading` object; old files are never rewritten. A different notes language blocks strict cache reuse before requests. Explicit historical acceptance still preserves the old JSON and its old language; it does not translate accepted readings or regenerate notes.
+
+CLI `transcribe` and `batch` expose `--notes-language {en,pt,es}`. `--lang` independently controls report presentation and never sets model notes implicitly. Localizing a report does not alter its cache identity.
+
 ## Review language belongs to the host
 
 Pass a callable `messages(message_id, context) -> str` that connects to the application's translation catalogue. It receives all presentation fragments: `source`, one canonical field name, and optionally `uncertainties`.
@@ -37,7 +71,7 @@ rows = suggestions(record, reading, filename,
                    options=options_used_for_this_reading)
 ```
 
-Use the same `TranscriptionOptions` for reading and suggestion rendering so the model label follows the actual selected model. An explicit `model_label` still overrides the display text. The host supplies its own language catalogue. `DEFAULT_MESSAGES` documents the English templates and is immutable. A mapping of template overrides is also accepted; missing entries fall back to English. Use a complete mapping or a callable for fully localized review text.
+Use the same `TranscriptionOptions` for reading and suggestion rendering so the model label follows the actual selected model. An explicit `model_label` still overrides the display text. The host can supply its own catalogue or start from `load_messages("pt", kind="review")`. `DEFAULT_MESSAGES` documents the English templates and is immutable. A mapping of template overrides is also accepted; missing entries fall back to English. Use a complete mapping or a callable for fully localized review text.
 
 Context contains `field`, `host_field`, `current`, `reading`, `filename`, `model`, and joined literal `uncertainties`. Text from the image/model is never translated. Render all returned values as plain text or escape them for the host UI; the library does not return trusted HTML.
 
@@ -120,7 +154,18 @@ print(delivery.archive, delivery.totals)
 
 ## Translate Excel and PDF presentation
 
-`create_report` and `batch_folder` accept `messages`, a mapping or `(message_id, context) -> str` callback. CLI report/batch accept the same mapping through `--messages-json`. Keys:
+`create_report` and `batch_folder` accept `messages`, a mapping or `(message_id, context) -> str` callback. Use the public loader for bundled templates:
+
+```python
+from herbarium_labels import load_messages, create_report
+messages = load_messages("pt", kind="report", profile="sennen")
+messages["column.filename"] = "Ficheiro do projeto"
+reports = create_report(images, output, profile="sennen", messages=messages)
+```
+
+`load_messages(lang, *, kind="report", profile=None)` accepts `en`, `pt`, or `es`; returns a fresh dictionary; defaults report profiles to `po-bryophytes` and reviews to `sennen`. Review messages currently support only Sennen; other review profiles raise `ValueError`. External report profiles receive translated common presentation labels, translated filename headings, and their own profile-specific column names; hosts supply any additional translations.
+
+CLI report/batch accept `--lang {en,pt,es}` and `--messages-json`; JSON entries override the selected catalogue key by key. Omitting both preserves existing English behavior. Invalid catalogue keys still fail report validation before batch requests. Keys:
 
 - `sheet.literal`, `sheet.fields`: Excel sheet names.
 - `column.filename`, `column.image`, `column.literal_text`, `column.handwritten_notes`, `column.uncertainties`, `column.reviewed`: literal-review headings and PDF labels.
@@ -129,7 +174,7 @@ print(delivery.archive, delivery.totals)
 
 The callback context includes `profile` and the English `default` template. A mapping may contain `{profile}` placeholders; a callback returns the final text. Resolve a complete map/callback for fully localized reports; missing mapping entries fall back to English. Sheet names are validated for Excel restrictions, length, and distinctness before paid batch calls. Text is resolved once per report/batch. Literal readings, uncertainty values, scientific field keys, output filenames, and original images are unchanged. PDF markup is escaped.
 
-Complete Portuguese mappings for the built-in profiles are in `examples/synthetic/report-messages-po-pt.json` and `report-messages-sennen-pt.json`. Use the mapping matching the selected profile; unknown message keys are rejected.
+Bundled Portuguese uses European Portuguese. Spanish requires review by a native speaker with domain expertise ("requer revisão por falante nativo da área"). Every catalogue has the same keys and format markers as English. The English catalogue matches the preceding default templates exactly. Existing complete Portuguese custom mappings remain in `examples/synthetic/report-messages-po-pt.json` and `report-messages-sennen-pt.json`. Use the mapping matching the selected profile; unknown message keys are rejected.
 
 ## Continue an older reviewed folder
 

@@ -14,6 +14,7 @@ ROOT_FILES = {
     'pyproject.toml', 'MANIFEST.in', 'PKG-INFO', 'setup.cfg',
     'requirements.lock', 'requirements-compat.lock', 'requirements-dev.in', 'requirements-dev.lock', '.env.example', '.gitignore',
 }
+LOCALE_FILES = {'en.json', 'pt.json', 'es.json'}
 SECRET = re.compile(
     rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
     rb'|\bsk-ant-[A-Za-z0-9_-]{20,}'
@@ -28,11 +29,13 @@ def allowed_source(path):
     if len(parts) == 1:
         return path.name in ROOT_FILES
     if parts[:2] == ('src', 'herbarium_labels'):
-        return path.suffix == '.py'
+        return (path.suffix == '.py' or
+                len(parts) == 4 and parts[2] == 'locales' and path.name in LOCALE_FILES)
     if parts[:2] == ('src', 'herbarium_labels.egg-info'):
         return path.name in {'PKG-INFO', 'SOURCES.txt', 'dependency_links.txt',
                              'entry_points.txt', 'requires.txt', 'top_level.txt'}
     return ((parts[0] in {'tests', 'tools'} and path.suffix == '.py')
+            or (parts[:2] == ('tests', 'fixtures') and path.suffix == '.json')
             or (parts[0] == 'docs' and path.suffix in {'.md', '.mmd', '.svg'})
             or (parts[:2] == ('examples', 'synthetic') and path.suffix in {'.md', '.jpg', '.png', '.pdf', '.xlsx', '.json'})
             or (parts[0] == 'library' and path.suffix == '.json')
@@ -41,7 +44,8 @@ def allowed_source(path):
 
 def allowed_wheel(path):
     if path.parts[0] == 'herbarium_labels':
-        return path.suffix == '.py'
+        return (path.suffix == '.py' or len(path.parts) == 3 and
+                path.parts[1] == 'locales' and path.name in LOCALE_FILES)
     if not path.parts[0].endswith('.dist-info'):
         return False
     return path.name in {'METADATA', 'WHEEL', 'RECORD', 'entry_points.txt',
@@ -99,11 +103,15 @@ def check(archive):
     names = {path.name for path in seen}
     required = {'LICENSE', 'NOTICE.md', 'bryophytes.py', 'sennen.py', 'cache.py', 'catalog.py', 'legacy.py', 'demo.py',
                 'imaging.py', 'provider.py', 'profiles.py', 'pipeline.py', 'pricing.py', 'errors.py', 'suggestions.py', 'cli.py',
-                'existing.py', 'report_messages.py', 'sennen_suggestions.py'}
+                'existing.py', 'report_messages.py', 'sennen_suggestions.py', 'prompts.py', 'messages.py'}
     if not wheel:
         required |= {'README.md', 'catalog.json', 'catalog.schema.json', 'requirements.lock'}
     if required - names:
         raise ValueError(f'Missing required files: {sorted(required - names)}')
+    package = 'herbarium_labels' if wheel else 'src/herbarium_labels'
+    locales = {PurePosixPath(package, 'locales', name) for name in LOCALE_FILES}
+    if locales - seen:
+        raise ValueError(f'Missing required locales: {sorted(str(path) for path in locales - seen)}')
     if metadata is None or metadata['Name'] != 'herbarium-labels':
         raise ValueError('Missing or unexpected package metadata')
     if metadata['License-Expression'] != 'MIT' or metadata['Requires-Python'] != '>=3.11':

@@ -3,6 +3,7 @@ import io
 from pathlib import Path
 import runpy
 import tempfile
+import tarfile
 import unittest
 import zipfile
 
@@ -11,12 +12,13 @@ CHECK = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'tools/check_di
 
 
 class DistributionTests(unittest.TestCase):
-    def wheel(self, folder, extra=None):
+    def wheel(self, folder, extra=None, *, omit=()):
         target = Path(folder) / 'synthetic.whl'
         entries = {f'herbarium_labels/{name}.py': b'# synthetic module'
                    for name in ('bryophytes', 'sennen', 'cache', 'catalog', 'legacy', 'demo', 'imaging', 'provider', 'profiles', 'pipeline',
                                 'pricing', 'errors', 'suggestions', 'cli', 'existing', 'report_messages',
-                                'sennen_suggestions')}
+                                'sennen_suggestions', 'prompts', 'messages')}
+        entries.update({f'herbarium_labels/locales/{lang}.json': b'{}' for lang in ('en', 'pt', 'es')})
         entries.update({
             'herbarium_labels-0.1.0a2.dist-info/licenses/LICENSE': b'MIT License',
             'herbarium_labels-0.1.0a2.dist-info/licenses/NOTICE.md': b'Synthetic notice',
@@ -25,6 +27,8 @@ class DistributionTests(unittest.TestCase):
                 b'License-Expression: MIT\nRequires-Python: >=3.11\n\nSynthetic README\n'),
         })
         entries.update(extra or {})
+        for name in omit:
+            entries.pop(name)
         with zipfile.ZipFile(target, 'w') as bundle:
             for name, content in entries.items():
                 bundle.writestr(name, content)
@@ -38,6 +42,38 @@ class DistributionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaisesRegex(ValueError, 'Unexpected distribution file'):
                 CHECK(self.wheel(folder, {'.env': b'private settings'}))
+
+    def test_every_wheel_locale_is_required_at_its_package_path(self):
+        for lang in ('en', 'pt', 'es'):
+            with self.subTest(lang=lang), tempfile.TemporaryDirectory() as folder:
+                with self.assertRaisesRegex(ValueError, 'Missing required locales'):
+                    CHECK(self.wheel(folder, omit=(f'herbarium_labels/locales/{lang}.json',)))
+
+    def test_sdist_requires_locales_too(self):
+        with tempfile.TemporaryDirectory() as folder:
+            wheel = self.wheel(folder)
+            source = Path(folder) / 'synthetic.tar.gz'
+            with zipfile.ZipFile(wheel) as bundle:
+                entries = {'src/' + name: bundle.read(name) for name in bundle.namelist()
+                           if name.startswith('herbarium_labels/')}
+                entries['PKG-INFO'] = bundle.read('herbarium_labels-0.1.0a2.dist-info/METADATA')
+            entries.update({name: b'synthetic' for name in
+                            ('LICENSE', 'NOTICE.md', 'README.md', 'library/catalog.json',
+                             'library/catalog.schema.json', 'requirements.lock')})
+            for missing in (None, 'src/herbarium_labels/locales/pt.json'):
+                with tarfile.open(source, 'w:gz') as bundle:
+                    for name, content in entries.items():
+                        if name == missing:
+                            continue
+                        member = tarfile.TarInfo('synthetic/' + name)
+                        member.size = len(content)
+                        bundle.addfile(member, io.BytesIO(content))
+                if missing:
+                    with self.assertRaisesRegex(ValueError, 'Missing required locales'):
+                        CHECK(source)
+                else:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        CHECK(source)
 
     def test_archive_traversal_is_rejected(self):
         with tempfile.TemporaryDirectory() as folder:

@@ -1,3 +1,68 @@
+# 0.1.0a4 Portuguese review wording follow-up
+
+Date: 2026-10-26. The maintainer has applied the base 0.1.0a4 patch and reports 104 passing tests plus exact default prompt/cache equivalence to the published 0.1.0a3 in both built-in profiles. Their private Taxa comparison found matching fields, values, and uncertainties but four different expressions. The earlier isolation statements below describe preparation time, not the current application state.
+
+This isolated incremental follow-up aligns two Portuguese review templates with the maintainer-supplied legacy wording: photograph/source confirmation and the exsiccata_number caption/Sennen-label phrase. The new regression checks both templates and a complete rendered suggestion, including its value and unchanged uncertainty. It failed against the earlier catalogue before the two entries were corrected. The assistant did not execute the private Taxa comparison or inspect all 549 existing reviews.
+
+- **105 tests passed, no skips**, against source and the installed wheel with Pillow **13.0.0** and **11.3.0** on Linux/Python 3.12.14; all clients/transports remain simulated.
+- Commands: `PYTHONPATH=src python -m unittest discover -s tests -v` for each source environment; `env -u PYTHONPATH python -m unittest discover -s tests -v` for each separately installed wheel environment. Runtime dependencies follow the unchanged primary/compatibility hash locks; dependency consistency checks passed.
+- `python -m build --no-isolation`, `python -m twine check --strict`, and `python tools/check_dist.py` passed for both archives. Required locale paths remain present; catalogue key/format-marker parity and exact default prompt/cache regressions passed in every suite run.
+- Only Portuguese review presentation changes. Version remains 0.1.0a4. English/Spanish catalogues, report messages, scientific prompts/schemas, comparison rules, cache identity, dependency locks, and original readings are unchanged. Public-file hashes and incremental patch applicability were verified.
+
+No assistant application to the maintainer working tree, commit, tag, push, publication, paid API call, native Windows run, or private-data modification occurred. The maintainer applies this follow-up before their normal CI/TestPyPI/PyPI release checks.
+
+---
+
+# 0.1.0a4 candidate validation
+
+Date: 2026-10-26. Published baseline: `0.1.0a3`. Candidate prepared in an isolated temporary copy for maintainer review/application. No assistant working-tree application, commit, tag, push, upload, paid API call, or private-data modification occurred.
+
+## Automated checks
+
+| Target | Pillow | Result |
+| --- | --- | --- |
+| Source (`PYTHONPATH=src`) | 13.0.0 | 104 tests passed, no skips |
+| Source (`PYTHONPATH=src`) | 11.3.0 | 104 tests passed, no skips |
+| Installed wheel (`PYTHONPATH` unset) | 13.0.0 | 104 tests passed, no skips |
+| Installed wheel (`PYTHONPATH` unset) | 11.3.0 | 104 tests passed, no skips |
+
+All four runs used Linux/Python 3.12.14 and the optional SDK/report dependencies, including Anthropic 1.17.0 through simulated transport only. Wheel import paths and 0.1.0a4 metadata were confirmed in separate environments. Runtime packages match requirements.lock or requirements-compat.lock. The Pillow 11.3 wheel was preinstalled from a local cache after its SHA-256 was checked against requirements-compat.lock, then the remaining hashed compatibility lock was installed offline. Both dependency consistency checks passed.
+
+Commands executed against the isolated proposal (each interpreter selects the stated environment):
+
+```sh
+PYTHONPATH=src SOURCE_PILLOW13_PYTHON -m unittest discover -s tests -v
+PYTHONPATH=src SOURCE_PILLOW11_PYTHON -m unittest discover -s tests -v
+env -u PYTHONPATH WHEEL_PILLOW13_PYTHON -m unittest discover -s tests -v
+env -u PYTHONPATH WHEEL_PILLOW11_PYTHON -m unittest discover -s tests -v
+BUILD_PYTHON -m build --no-isolation --outdir DIST_DIR
+BUILD_PYTHON -m twine check --strict DIST_DIR/*
+python3 tools/check_dist.py DIST_DIR/*
+python3 tools/check_workflows.py
+uv pip check --python WHEEL_PILLOW13_PYTHON
+uv pip check --python WHEEL_PILLOW11_PYTHON
+```
+
+`SOURCE_PILLOW13_PYTHON`, `SOURCE_PILLOW11_PYTHON`, `WHEEL_PILLOW13_PYTHON`, `WHEEL_PILLOW11_PYTHON`, `BUILD_PYTHON`, and `DIST_DIR` stand for the selected temporary environment executables/artifact directory, not literal shell commands. The maintainer can run the equivalent commands in separate environments installed from each lock. Build produced wheel and source archive; the wheel was built from that source archive. Strict Twine checks passed. Distribution checks passed with all three locale resources at their package paths in both archives (31 wheel files, 97 source files). The public manifest and patch applicability were also verified.
+
+## Regression scope
+
+Twenty additional tests cover frozen 0.1.0a3 prompt/cache contracts, all explicit notes languages, rejected language codes, effective-prompt cache changes, injected-client and external-profile requests, unchanged literal reading values, persisted notes-language metadata, strict resume conflicts before requests, old JSON reuse without rewriting, catalogue key/format-marker parity, default-English equality, Portuguese terminology, independent message loads, host-mapped review rendering, CLI notes/report separation and JSON overrides, actual Portuguese workbook output, and rejection of incomplete wheel/source locale sets.
+
+The frozen fixture was captured from unmodified 0.1.0a3 before implementation, using a fixed synthetic image byte sequence and deterministic dependency-version values. No profile prompt, scientific reading schema, image policy, comparison rule, price precedence, dependency lock, or existing original JSON was changed.
+
+## Localized artifact inspection and limits
+
+Six synthetic Excel/PDF deliveries were generated through the installed wheel: both profiles in English, Portuguese, and Spanish. Workbook sheet names, unchanged literal text and formula-safe cells were checked. Portuguese/Spanish PDF headings, literal text, and metadata were extracted; their four one-page PDFs were rendered and visually inspected with readable labels and no observed clipping in these short fixtures. Source images are synthetic white images; this is not a transcription-quality evaluation.
+
+Offline tests validate request/software contracts, not live model compliance with the optional language rule. Spanish still requires review by a native speaker with domain expertise. No private Taxa equivalence suite or native Windows execution was performed. The maintainer's future Taxa release must pin the exact 0.1.0a4 version and retain exact suggestion/review equivalence tests before replacing its implementation. Broad Unicode/long-text PDF coverage, real HEIF inputs, and authorized live evaluation remain separate work.
+
+## Published 0.1.0a3 evidence
+
+The maintainer supplied TestPyPI download/install logs, site-packages import/version confirmation, 84 passing tests without skips, and a synthetic demo with all checks true. They then supplied successful PyPI publish workflow run 40387409728. These facts supersede preparation-only status statements in the historical records below; no 0.1.0a4 publication is claimed.
+
+---
+
 # Validation record
 
 Date: 2026-10-26. Release target: `0.1.0a3`; preceding implementation patches have been applied by the maintainer. This final release-polish increment is prepared/tested in isolation for maintainer application. No tag, commit, push, or upload was made by the assistant.

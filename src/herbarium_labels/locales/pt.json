@@ -1,0 +1,65 @@
+{
+  "report": {
+    "common": {
+      "sheet.literal": "Transcrição literal",
+      "sheet.fields": "Campos",
+      "column.filename": "Ficheiro",
+      "column.image": "Imagem",
+      "column.literal_text": "Transcrição literal",
+      "column.handwritten_notes": "Notas manuscritas",
+      "column.uncertainties": "Dúvidas de leitura",
+      "column.reviewed": "Revisto",
+      "pdf.title": "Revisão de transcrições de {profile}",
+      "review.choices": "[ ] sim    [ ] corrigido"
+    },
+    "profiles": {
+      "po-bryophytes": {
+        "field.filename": "Ficheiro",
+        "field.herbarium": "Herbário",
+        "field.collection_series": "Coleção / série",
+        "field.name_as_written": "Nome como escrito",
+        "field.species": "Espécie",
+        "field.taxonomic_author": "Autor taxonómico",
+        "field.determiner": "Determinador",
+        "field.country_province": "País / província",
+        "field.locality": "Localidade",
+        "field.ecology": "Ecologia",
+        "field.altitude": "Altitude",
+        "field.utm": "UTM",
+        "field.date_as_written": "Data como escrita",
+        "field.date_iso": "Data ISO",
+        "field.collector": "Coletor",
+        "field.collection_number": "Número de colheita",
+        "field.handwritten_notes": "Notas manuscritas",
+        "field.uncertainties": "Dúvidas de leitura",
+        "field.literal_text": "Texto literal"
+      },
+      "sennen": {
+        "field.filename": "Ficheiro",
+        "field.labels": "Etiquetas",
+        "field.general_accession_number": "Número geral",
+        "field.order_number": "Número de ordem",
+        "field.sennen_exsiccata_number": "Número de exsiccata Sennen",
+        "field.shelfmark": "Cota",
+        "field.sennen_label_name": "Nome na etiqueta Sennen",
+        "field.porto_label_name": "Nome na etiqueta Porto",
+        "field.locality": "Localidade",
+        "field.altitude": "Altitude",
+        "field.collection_date": "Data de colheita",
+        "field.collector": "Coletor",
+        "field.uncertainties": "Dúvidas de leitura"
+      }
+    }
+  },
+  "review": {
+    "sennen": {
+      "source": "Sugestão automática ({model}) a partir da fotografia {filename}. Confirme na imagem antes de aceitar.",
+      "transcription": "Transcrição literal das etiquetas.",
+      "shelfmark": "Cota atual: «{current}». Leitura: «{reading}».",
+      "exsiccata_number": "exsiccata_number atual: «{current}». Leitura na etiqueta Sennen: «{reading}».",
+      "collection_date": "Data atual: «{current}». Leitura: «{reading}».",
+      "original_locality": "Localidade original atual: «{current}». Leitura: «{reading}».",
+      "uncertainties": "\n\nDúvidas assinaladas pelo modelo:\n- {uncertainties}"
+    }
+  }
+}

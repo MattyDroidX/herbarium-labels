@@ -1,5 +1,9 @@
 # herbarium-labels
 
+Português: biblioteca para transcrever etiquetas de herbário e preparar ficheiros para revisão, com relatórios e pareceres em português. Consulte a [instalação](#install).
+
+Español: biblioteca para transcribir etiquetas de herbario y preparar archivos para revisión, con informes y sugerencias en español. Consulte la [instalación](#install). La traducción al español requiere revisión por un hablante nativo del área.
+
 Transcribe botanical labels into structured JSON and create Excel, PDF, and ZIP deliveries for human review. Built from research workflows for PO/LISU bryophytes and F. Sennen sheets, with separate scientific contracts for each collection.
 
 ## Install
@@ -7,12 +11,18 @@ Transcribe botanical labels into structured JSON and create Excel, PDF, and ZIP 
 Python 3.11+:
 
 ```sh
-python -m pip install "herbarium-labels[all]==0.1.0a3"
+python -m pip install "herbarium-labels[all]==0.1.0a4"
 ```
 
-This documentation describes **0.1.0a3**. The PyPI command applies after that version is published; before publication, install the reviewed source with `python -m pip install -e ".[all]"`. The previous alpha, [0.1.0a2](https://pypi.org/project/herbarium-labels/0.1.0a2/), is already published. Extras are `claude`, `reports`, `heif`, and `all`.
+This documentation describes the **0.1.0a4 release candidate**. Use the PyPI command after publication; during preparation, install the reviewed source with `python -m pip install -e ".[all]"`. The preceding alpha, [0.1.0a3](https://pypi.org/project/herbarium-labels/0.1.0a3/), is published. Extras are `claude`, `reports`, `heif`, and `all`.
 
 The declared compatibility floor is Pillow 11.3; the recommended hashed environment in `requirements.lock` uses Pillow 13. Compatibility with an older version does not mean it contains current security fixes. The Pillow 11.3 test is a functional integration check, not a recommendation to downgrade.
+
+Pin the exact alpha in consuming projects, for example `herbarium-labels==0.1.0a4` in `requirements.txt` after release. Avoid a floating alpha range: interfaces and cache configuration can change between versions.
+
+## Public API and compatibility
+
+The supported Python API is `read_image`, `TranscriptionOptions`, `TranscriptionError`, `TranscriptionProfile`, `get_profile`, `register_profile`, `list_profiles`, `transcribe_folder`, `create_report`, `batch_folder`, `ReportFiles`, `BatchResult`, `TokenPrices`, `load_messages`, and `sennen.suggestions` (also `sennen_suggestions.build_suggestions`). These contracts are stable within each published alpha. Incompatible changes or removal require a CHANGELOG notice in at least one preceding alpha; deprecated adapters remain available during that notice period. Documented legacy adapters retain compatibility until such notice. Other module helpers and implementation details are internal.
 
 ## Try it offline
 
@@ -59,7 +69,7 @@ for label in reading.labels:
     print(label.origin, label.literal_text)
 ```
 
-Clients, model settings, request limiting, field mapping, and review translations are caller-configurable. See [integration examples](docs/INTEGRATION.md) for Taxa's `cota` mapping and host-owned translations. These extension options require 0.1.0a3; the published 0.1.0a2 exposes `sennen.read_labels(content, client=None)`.
+Clients, model settings, request limiting, field mapping, and review translations are caller-configurable. See [integration examples](docs/INTEGRATION.md) for Taxa's `cota` mapping and host-owned translations. Core reuse interfaces are available since 0.1.0a3; optional model-note languages and bundled catalogues require 0.1.0a4. The earlier `sennen.read_labels(content, client=None)` adapter remains available.
 
 ## Process folders from Python
 
@@ -76,14 +86,25 @@ reports = create_report("input", "output", profile="sennen", messages=report_tra
 
 `batch_folder` performs transcription and delivery together. Price precedence is `prices=` > `options.prices` > environment, and the selected rates apply to both stages without modifying the supplied options. For separate calls, use `options.prices` for transcription and pass the same object as `create_report(..., prices=options.prices)`. `register_profile` adds a Python profile in the current process; installed packages can advertise profiles to the CLI through `herbarium_labels.profiles` entry points. Run `herbarium-labels profiles` to list names. See the [integration guide](docs/INTEGRATION.md) for complete contracts and plugin metadata.
 
-Report messages may be a mapping or callback. For a Portuguese PO/LISU report:
+## Select presentation and notes languages
+
+Report messages may be a mapping or callback. Bundled `en`, `pt` (European Portuguese), and `es` catalogues include both profiles' report headings/PDF labels and Sennen review messages. Spanish requires review by a native speaker with domain expertise. `--lang` selects report presentation; `--notes-language` independently instructs the model to write only `uncertainties` in the selected language. Literal and other transcribed fields always remain in their original language. With no notes language, the prompt and cache configuration remain identical to 0.1.0a3 under the same dependencies/settings.
+
+```sh
+herbarium-labels batch --profile sennen --images ./input --pdf --lang pt --notes-language pt
+herbarium-labels report --profile po-bryophytes --images ./input --output ./output --lang pt
+```
+
+CLI `report` and `batch` accept `--lang`; `transcribe` and `batch` accept `--notes-language`. Both are optional. `--messages-json` overrides selected catalogue entries key by key. Python callers use `load_messages("pt", kind="report", profile="sennen")` or `load_messages("pt", kind="review")`. English defaults remain unchanged; no language-specific commands or entry points are added.
+
+Existing custom report maps still work:
 
 ```sh
 herbarium-labels report --profile po-bryophytes --images ./input --output ./output \
   --messages-json examples/synthetic/report-messages-po-pt.json
 ```
 
-Only presentation changes; literal labels and uncertainties retain their source text. [Portuguese synthetic report examples](examples/synthetic/README.md) include Excel/PDF and a preview.
+Report localization changes presentation only; existing literal labels and uncertainty values are not rewritten. New model uncertainty notes change language only when `notes_language` is explicitly selected. [Portuguese synthetic report examples](examples/synthetic/README.md) include Excel/PDF and a preview.
 
 ## Continue a legacy output folder
 

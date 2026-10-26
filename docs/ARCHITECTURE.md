@@ -1,6 +1,6 @@
 # Architecture overview
 
-This describes the proposed 0.1.0a3 source. The published 0.1.0a2 uses independent readers. [Open the SVG](diagrams/architecture.svg) or edit the [Mermaid source](diagrams/architecture.mmd).
+This describes the shared architecture published in 0.1.0a3 and extended by the 0.1.0a4 candidate. [Open the SVG](diagrams/architecture.svg) or edit the [Mermaid source](diagrams/architecture.mmd).
 
 ![Architecture overview](diagrams/architecture.svg)
 
@@ -31,3 +31,5 @@ The host owns authentication, optional request concurrency/user limits, field ma
 Cache checks precede requests. Strict conflicts stop; explicit historical acceptance records hashes separately while preserving original JSON; incomplete readings are not saved. The CLI exits nonzero for transcription failures. Batch requires complete input coverage before reports/ZIP. Standalone reports require no competing writer. See [integration](INTEGRATION.md), [testing](TESTING.md), and the remaining [roadmap](https://github.com/MattyDroidX/herbarium-labels/blob/main/PLAN.md).
 
 The host can supply report translations as well as review-suggestion messages. Explicit acceptance stores historical provenance separately from new cache identity; it does not establish scientific approval. See [continuing older folders](INTEGRATION.md#continue-an-older-reviewed-folder).
+
+In 0.1.0a4, `prompts.py` appends the optional uncertainty-language instruction for every profile. The provider and cache use that same effective prompt; an omitted language retains the preceding identity. `messages.py` loads bundled report/review templates independently, so presentation language does not change model requests or cached literal evidence.

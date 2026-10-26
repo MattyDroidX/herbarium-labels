@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased — 0.1.0a3
+## Unreleased — 0.1.0a4
+
+- Retain the maintainer-supplied Taxa wording in Portuguese Sennen reviews (photograph/source confirmation and the `exsiccata_number` caption/Sennen reading phrase), with an exact rendered-text regression.
+
+- Add optional `TranscriptionOptions.notes_language` and CLI `--notes-language` for English, Portuguese, or Spanish uncertainty notes. A single shared instruction serves all profiles; original transcribed text and scientific schemas remain unchanged. `None` retains the 0.1.0a3 prompt/cache identity exactly; explicit languages change the effective-prompt identity and are recorded in JSON metadata.
+- Bundle English, European Portuguese, and Spanish report/Sennen-review catalogues with public `load_messages`. Add report/batch `--lang` and key-by-key JSON overrides. Spanish requires native domain review. Validate matching keys/format markers and require locale resources in wheel/source distributions.
+- Add Portuguese/Spanish discovery keywords and README introductions. Document the public API, exact alpha pins, one-preceding-alpha notice for incompatible changes/removal, and the separate future Taxa migration/equivalence gate.
+- Preserve batch price precedence (`prices` > `options.prices` > environment), explicit legacy-folder selection, and historical acceptance behavior from 0.1.0a3. No new dependencies or language-specific commands/entry points.
+
+## 0.1.0a3 — 2026-10-26
 
 - Write non-ASCII JSON fixtures explicitly as UTF-8 and exercise the legacy-reading test under simulated CP1252 defaults, fixing the Windows CI failure without changing runtime readers.
 

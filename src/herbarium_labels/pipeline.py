@@ -19,6 +19,7 @@ from .imaging import upright, prepare_images, register_heif_opener
 from .legacy import RECORD_SCHEMA_VERSION, normalize_record
 from .profiles import get_profile
 from .provider import TranscriptionOptions, create_client, close_client, request_reading
+from .prompts import effective_prompt
 
 def safe_photo(folder, name):
     root = Path(folder).resolve()
@@ -46,7 +47,7 @@ def cache_configuration(profile, options, *, version_fn=version):
     except PackageNotFoundError:
         provider_version = None
     return {'profile': profile.name, 'model': options.resolved_model,
-            'prompt': profile.prompt, 'schema': profile.schema.model_json_schema(),
+            'prompt': effective_prompt(profile, options.notes_language), 'schema': profile.schema.model_json_schema(),
             'anthropic': provider_version, 'pydantic': version_fn('pydantic'),
             'max_tokens': options.max_tokens, 'transform': 'shared-exif-rgb-thumbnail-jpeg-v2',
             'images': asdict(profile.images), 'pillow': version_fn('Pillow'),
@@ -142,6 +143,7 @@ def _transcribe(images, output, profile, options, client=None, configuration=Non
         partial = target.with_suffix('.json.partial')
         partial.write_text(json.dumps({'schema_version':RECORD_SCHEMA_VERSION, 'filename':path.name, 'profile':profile.name, 'model':options.resolved_model, 'elapsed_seconds':round(time.time() - started, 1),
                                       'input_tokens':usage['input_tokens'], 'output_tokens':usage['output_tokens'],
+                                      'notes_language':options.notes_language,
                                       'cache':expected, 'reading':reading.model_dump()}, ensure_ascii=False, indent=2), encoding='utf-8')
         if target.exists():
             raise ValueError(f'{target.name}: a result appeared during the run; it was not replaced.')

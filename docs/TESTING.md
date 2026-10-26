@@ -22,14 +22,16 @@ Use `--images` for an input directory and `--output` for transcription/report ou
 python -m unittest discover -s tests -v
 ```
 
-Expected result for the reviewed reuse proposal: 84 tests and `OK`, without a real API key. The SDK contract test needs the `claude` extra; it uses mock HTTP transport, not the provider service. Full-suite reporting/demo tests need the `reports` extra. Installing the runtime lock provides both. `PYTHONPATH=src` is available for source-only development but must be unset when checking a wheel.
+Expected result for the 0.1.0a4 candidate: 105 tests and `OK`, without a real API key. The SDK contract test needs the `claude` extra; it uses mock HTTP transport, not the provider service. Full-suite reporting/demo tests need the `reports` extra. Installing the runtime lock provides both. `PYTHONPATH=src` is available for source-only development but must be unset when checking a wheel.
 
 | Test file | Main evidence |
 | --- | --- |
 | `test_core.py` | Rotation, paths, research-flow compatibility, reports, full sheet/crop, separate labels |
 | `test_cache.py` | Image/config changes, preserved corrections, preflight, locking, failure/resume, token aggregation |
 | `test_sdk.py` | Actual installed SDK serializes schemas and parses simulated HTTP responses |
-| `test_distribution.py` | Distribution paths, required notices, forbidden files, credential-pattern rejection |
+| `test_distribution.py` | Distribution paths, required notices/locales, forbidden files, credential-pattern rejection |
+| `test_reuse.py` / `test_folder_api.py` | Host mappings, profiles/plugins, folder APIs, prices, review/report messages, historical acceptance |
+| `test_localization.py` | Exact default prompt/cache compatibility, notes language, catalogue parity, CLI language selection |
 | `test_english_api.py` | English interfaces, legacy reads without text changes, schema/version conflicts, demo CLI |
 
 These are engineering checks. They do not measure transcription accuracy on real handwriting.
@@ -85,12 +87,12 @@ Never overwrite a human correction to obtain a new model result. Old cache confi
 
 ```sh
 python -m pip install --require-hashes -r requirements-dev.lock
-python -m build --no-isolation
-python -m twine check --strict dist/*
-python tools/check_dist.py dist/*
+python -m build --no-isolation --outdir dist/0.1.0a4
+python -m twine check --strict dist/0.1.0a4/*
+python tools/check_dist.py dist/0.1.0a4/*
 python -m venv .wheel-venv
 .wheel-venv/bin/python -m pip install --require-hashes -r requirements.lock
-.wheel-venv/bin/python -m pip install --no-deps dist/herbarium_labels-0.1.0a3-py3-none-any.whl
+.wheel-venv/bin/python -m pip install --no-deps dist/0.1.0a4/herbarium_labels-0.1.0a4-py3-none-any.whl
 .wheel-venv/bin/python -m unittest discover -s tests -v
 .wheel-venv/bin/python -m herbarium_labels demo --output ./wheel-demo --pdf
 ```
@@ -122,7 +124,7 @@ print(len(catalog.samples), len(catalog.attributions))  # 0, 0
 
 A valid schema confirms structure and references. It does not establish who wrote a label, clear image rights, or make a draft profile suitable for automatic selection. The catalogue is not currently inserted into either transcription prompt.
 
-## Reuse contract checks (proposed 0.1.0a3)
+## Reuse contract checks (available since 0.1.0a3)
 
 Run `python -m unittest discover -s tests -v` on the reviewed source and installed wheel. `test_reuse.py` covers Taxa mappings on input/output, complete host translations, literal uncertainty preservation, missing-key errors, client ownership, per-call options, optional host limiting, EXIF/crop/no-upscaling behavior, custom profiles, Sennen cache/report/ZIP delivery, cross-profile cache rejection, human corrections, and CLI failure status.
 
@@ -143,3 +145,13 @@ The release-polish regression confirms that a batch-level price override reaches
 ## Cross-platform fixture encodings
 
 JSON fixtures containing literal non-ASCII characters must use `encoding="utf-8"`. Locale-default writes can produce CP1252 on Windows, which is not a valid encoding for the runtime JSON byte reader. The legacy Portuguese-envelope regression simulates CP1252 fallback while writing a UTF-8 fixture explicitly, then verifies that acceptance leaves every JSON byte unchanged. Do not loosen runtime decoding or force a UTF-8 CI locale to hide an invalid fixture.
+
+## 0.1.0a4 language and distribution regression checks
+
+The expanded suite has 105 offline tests. `tests/test_localization.py` checks frozen 0.1.0a3 prompt/cache hashes (captured before implementation in `tests/fixtures/a3-contracts.json`), injected-client requests for every notes language and an external profile, metadata/resume conflicts, unchanged source reading values, catalogue key/format-marker parity, existing Portuguese terminology, Sennen review rendering, and CLI language/JSON precedence. Distribution tests reject wheels or source archives missing locale files at their package paths.
+
+Run all tests against source with both runtime locks, then install the built wheel in separate clean environments and rerun without `PYTHONPATH`. `requirements.lock` uses Pillow 13; `requirements-compat.lock` uses Pillow 11.3. Include the `claude` SDK/report extras through these locks so no SDK test is skipped. The publication guide includes wheel verification commands.
+
+These tests exercise software/request contracts with simulated clients. They do not establish live model translation compliance, linguistic review of Spanish, or equivalence to every private Taxa review template. Taxa must preserve its own exact equivalence regression before replacing its implementation.
+
+The Portuguese review regression additionally pins the maintainer-supplied Taxa source/exsiccata wording and a complete rendered review with its original uncertainty. This presentation-only follow-up keeps the scientific request and cache configuration unchanged.

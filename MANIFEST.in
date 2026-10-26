@@ -3,7 +3,9 @@ include pyproject.toml MANIFEST.in
 include requirements.lock requirements-dev.in requirements-dev.lock requirements-compat.lock
 include .env.example .gitignore
 recursive-include src/herbarium_labels *.py
+recursive-include src/herbarium_labels/locales *.json
 recursive-include tests *.py
+recursive-include tests/fixtures *.json
 recursive-include tools *.py
 recursive-include docs *.md *.mmd *.svg
 recursive-include library *.json

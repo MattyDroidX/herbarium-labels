@@ -52,22 +52,28 @@ For catalogues, `rascunho`/`revisado` are read as `draft`/`reviewed`; `candidata
 
 See [TESTING.md](TESTING.md) for legacy-read regressions and [PROMPT_CHANGES.md](PROMPT_CHANGES.md) for the scientific evaluation boundary.
 
-## Proposed 0.1.0a3 reuse contracts
+## Published 0.1.0a3 reuse contracts
 
-The English API migration is already present in published 0.1.0a2. Its former patch is obsolete and removed. Version 0.1.0a3 is a new source proposal, not an update to the published tag.
+The English API migration is already present in published 0.1.0a2. Its former patch is obsolete and removed. Version 0.1.0a3 is a separate published alpha; keep all earlier published tags intact.
 
 Existing `bryophytes.transcribe/report/batch`, `sennen.read_labels`, and the default CLI remain available. New `--profile sennen` enables shared file deliveries. `read_image` accepts Python-defined profiles; see INTEGRATION.md.
 
 Use `suggestions(..., field_map={"shelfmark": "cota"}, messages=host_renderer)` for Taxa. Do not rename canonical schema fields globally. `read_labels` accepts `options` and `request_context`. It no longer applies a global semaphore; hosts own request/user limits. `check_rate(user_id)` now requires `limiter=callback` and raises if missing, so an old host cannot silently lose its quota check.
 
-The new shared image policy never upscales small images. Sennen still sends two views. Its prompt now describes the second image as a crop, removing only the word "enlarged". Other scientific prompt instructions and reading schemas are unchanged. The transform/profile cache identity changes deliberately; preserve old output and choose a fresh directory. Existing human corrections are never silently overwritten.
+The new shared image policy never upscales small images. Sennen still sends two views. Its prompt now describes the second image as a crop, removing only the word "enlarged". Other scientific prompt instructions and reading schemas are unchanged. The transform/profile cache identity changes deliberately; preserve old output and choose a fresh directory or explicitly accept existing readings as described below. Existing human corrections are never silently overwritten.
 
 Pillow metadata permits 11.3 while the primary hashed lock remains 13. Functional compatibility is tested independently; this does not backport decoder security fixes. CLI `transcribe` returns status 1 when its summary contains failures.
 
 ## Folder API and explicit historical imports (0.1.0a3 follow-up)
 
-The maintainer applied the preceding reuse patch and reported 61 passing tests plus three matching Taxa suggestion scenarios. The incremental follow-up adds plain path-based folder APIs, profile registration/installed entry points, report translations, explicit prices, consistent retry defaults, and `--accept-existing`. The version stays at the unreleased 0.1.0a3 target; no publication of that version is claimed.
+The maintainer applied the preceding reuse patch and reported 61 passing tests plus three matching Taxa suggestion scenarios. The incremental follow-up adds plain path-based folder APIs, profile registration/installed entry points, report translations, explicit prices, consistent retry defaults, and `--accept-existing`. These interfaces are included in the published 0.1.0a3 alpha.
 
 Existing namespace adapters and `herbarium_labels.suggestions` imports remain available. The implementation is now explicitly named `sennen_suggestions`. Pass the same `options` to reading and Sennen suggestion rendering to display the correct model.
 
 Strict cache identity checks remain the default. `--accept-existing` records a deliberate historical import in `.accepted-existing.json`, preserves every original JSON byte, and does not assign new pipeline provenance. It validates the whole batch, blocks known source mismatches, and marks absent historical image hashes as unverified. Keep the ledger with source images and JSON. No existing research directory is migrated automatically.
+
+## Optional language selection (0.1.0a4 candidate)
+
+Pin the exact alpha in each host application. `notes_language=None` preserves the 0.1.0a3 prompt/cache identity under the same dependencies/settings; upgrading the package alone does not invalidate that configuration. Explicit `en`, `pt`, or `es` appends a shared uncertainty-only instruction and changes the cache identity. New JSON records this option as envelope metadata. Existing JSON is not rewritten, and explicit historical acceptance does not regenerate old notes.
+
+Use `load_messages` or report/batch `--lang` for presentation; it is independent from `--notes-language`. Existing mapping/callback APIs and `--messages-json` remain supported. When combined, the JSON map overrides the selected catalogue key by key. See [integration](INTEGRATION.md) for the Portuguese Taxa example, the public API notice policy, and Taxa's separate exact-equivalence release gate.

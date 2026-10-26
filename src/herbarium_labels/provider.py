@@ -10,6 +10,7 @@ from .errors import TranscriptionError
 from .imaging import prepare_images
 from .profiles import get_profile
 from .pricing import TokenPrices
+from .prompts import effective_prompt
 
 
 DEFAULT_MAX_RETRIES = 2
@@ -23,9 +24,12 @@ class TranscriptionOptions:
     max_retries: int = DEFAULT_MAX_RETRIES
     workers: int = 6
     prices: TokenPrices | None = None
+    notes_language: str | None = None
 
     def __post_init__(self):
         import math
+        if self.notes_language is not None and self.notes_language not in ('en', 'pt', 'es'):
+            raise ValueError('notes_language must be en, pt, es, or None.')
         if self.prices is not None and not isinstance(self.prices, TokenPrices):
             raise ValueError('prices must be a TokenPrices instance.')
         if self.model is None:
@@ -76,7 +80,7 @@ def _request_reading(client, blocks, profile, options):
     try:
         response = client.messages.parse(model=options.resolved_model, max_tokens=options.max_tokens,
             output_format=profile.schema, messages=[{'role': 'user',
-            'content': blocks + [{'type': 'text', 'text': profile.prompt}]}])
+            'content': blocks + [{'type': 'text', 'text': effective_prompt(profile, options.notes_language)}]}])
     except Exception as error:
         if anthropic is not None and isinstance(error, anthropic.APIError):
             raise TranscriptionError('The transcription service did not respond.') from None

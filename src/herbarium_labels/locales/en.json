@@ -1,0 +1,65 @@
+{
+  "report": {
+    "common": {
+      "sheet.literal": "Literal transcription",
+      "sheet.fields": "Fields",
+      "column.filename": "Filename",
+      "column.image": "Image",
+      "column.literal_text": "Literal transcription",
+      "column.handwritten_notes": "Handwritten notes",
+      "column.uncertainties": "Reading uncertainties",
+      "column.reviewed": "Reviewed",
+      "pdf.title": "{profile} transcription review",
+      "review.choices": "[ ] yes    [ ] corrected"
+    },
+    "profiles": {
+      "po-bryophytes": {
+        "field.filename": "Filename",
+        "field.herbarium": "Herbarium",
+        "field.collection_series": "Collection / series",
+        "field.name_as_written": "Name as written",
+        "field.species": "Species",
+        "field.taxonomic_author": "Taxonomic author",
+        "field.determiner": "Determiner",
+        "field.country_province": "Country / province",
+        "field.locality": "Locality (Stat.)",
+        "field.ecology": "Ecology",
+        "field.altitude": "Altitude",
+        "field.utm": "UTM",
+        "field.date_as_written": "Date as written",
+        "field.date_iso": "ISO date",
+        "field.collector": "Collector (Leg.)",
+        "field.collection_number": "Nº",
+        "field.handwritten_notes": "Handwritten notes",
+        "field.uncertainties": "Reading uncertainties",
+        "field.literal_text": "Literal text"
+      },
+      "sennen": {
+        "field.filename": "Filename",
+        "field.labels": "Labels",
+        "field.general_accession_number": "General accession number",
+        "field.order_number": "Order number",
+        "field.sennen_exsiccata_number": "Sennen exsiccata number",
+        "field.shelfmark": "Shelfmark",
+        "field.sennen_label_name": "Sennen label name",
+        "field.porto_label_name": "Porto label name",
+        "field.locality": "Locality",
+        "field.altitude": "Altitude",
+        "field.collection_date": "Collection date",
+        "field.collector": "Collector",
+        "field.uncertainties": "Uncertainties"
+      }
+    }
+  },
+  "review": {
+    "sennen": {
+      "source": "Automatic suggestion ({model}) from image {filename}. Check the image before accepting.",
+      "transcription": "Literal transcription of the labels.",
+      "shelfmark": "Current shelfmark: «{current}». Reading: «{reading}».",
+      "exsiccata_number": "Current exsiccata number: «{current}». Sennen label reading: «{reading}».",
+      "collection_date": "Current date: «{current}». Reading: «{reading}».",
+      "original_locality": "Current original locality: «{current}». Reading: «{reading}».",
+      "uncertainties": "\n\nUncertainties flagged by the model:\n- {uncertainties}"
+    }
+  }
+}

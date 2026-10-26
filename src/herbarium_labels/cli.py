@@ -9,6 +9,7 @@ from .errors import TranscriptionError
 from .pricing import TokenPrices
 from .profiles import list_profiles
 from .provider import DEFAULT_MAX_RETRIES, TranscriptionOptions
+from .messages import load_messages
 
 
 def main():
@@ -30,6 +31,8 @@ def main():
         if name == 'report':
             command.add_argument('--no-pdf', action='store_true')
         else:
+            command.add_argument('--notes-language', choices=('en', 'pt', 'es'),
+                                 help='Language of model uncertainties only; transcribed text stays original.')
             command.add_argument('--model', help='Overrides TRANSCRIPTION_MODEL for this invocation.')
             command.add_argument('--workers', type=int, default=6)
             command.add_argument('--max-tokens', type=int, default=16000)
@@ -38,6 +41,8 @@ def main():
             command.add_argument('--accept-existing', action='store_true',
                                  help='Explicitly reuse valid earlier readings and record their hashes separately; never overwrite JSON.')
         if name in ('report', 'batch'):
+            command.add_argument('--lang', choices=('en', 'pt', 'es'),
+                                 help='Report presentation language; does not change model notes.')
             command.add_argument('--messages-json', type=Path, help='Report-message translations as a JSON object.')
         if name == 'batch':
             command.add_argument('--pdf', action='store_true')
@@ -60,17 +65,19 @@ def main():
         parser.error('--price-model requires explicit input/output prices.')
     try:
         prices = TokenPrices(args.price_in, args.price_out, model=args.price_model) if args.price_in is not None else None
-        messages = None
+        messages = load_messages(args.lang, profile=args.profile) if getattr(args, 'lang', None) else None
         if getattr(args, 'messages_json', None):
-            messages = json.loads(args.messages_json.read_text(encoding='utf-8'))
-            if not isinstance(messages, dict):
+            overrides = json.loads(args.messages_json.read_text(encoding='utf-8'))
+            if not isinstance(overrides, dict):
                 raise ValueError('Report-message JSON must contain an object.')
+            messages = {**(messages or {}), **overrides}
         if args.command == 'report':
             pipeline.create_report(args.images, args.output, profile=args.profile,
                                    include_pdf=not args.no_pdf, messages=messages, prices=prices)
             return
         options = TranscriptionOptions(model=args.model, workers=args.workers, max_tokens=args.max_tokens,
-                                       timeout=args.timeout, max_retries=args.max_retries, prices=prices)
+                                       timeout=args.timeout, max_retries=args.max_retries, prices=prices,
+                                       notes_language=args.notes_language)
         if args.command == 'transcribe':
             result = pipeline.transcribe_folder(args.images, args.output, profile=args.profile, options=options,
                                                 limit=args.limit, sample=args.sample,
