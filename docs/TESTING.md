@@ -139,3 +139,7 @@ The separately hashed `requirements-compat.lock` selects Pillow 11.3 for functio
 The checked-in Portuguese synthetic delivery is a presentation example, not a real collection result. Original literal text remains unchanged. The maintainer separately reported matching Taxa suggestions for shelfmark spacing, Roman-numeral dates, and uncertainties; the private application/tests are not copied or changed here.
 
 The release-polish regression confirms that a batch-level price override reaches both transcription and report estimates while leaving the caller options unchanged.
+
+## Cross-platform fixture encodings
+
+JSON fixtures containing literal non-ASCII characters must use `encoding="utf-8"`. Locale-default writes can produce CP1252 on Windows, which is not a valid encoding for the runtime JSON byte reader. The legacy Portuguese-envelope regression simulates CP1252 fallback while writing a UTF-8 fixture explicitly, then verifies that acceptance leaves every JSON byte unchanged. Do not loosen runtime decoding or force a UTF-8 CI locale to hide an invalid fixture.
