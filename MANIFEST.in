@@ -1,14 +1,13 @@
 include LICENSE NOTICE.md README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
-include AGENTS.md HANDOFF.md PLAN.md VALIDATION.md
-include pyproject.toml MANIFEST.in MANIFEST.sha256
-include requirements.lock requirements-dev.in requirements-dev.lock
+include pyproject.toml MANIFEST.in
+include requirements.lock requirements-dev.in requirements-dev.lock requirements-compat.lock
 include .env.example .gitignore
 recursive-include src/herbarium_labels *.py
 recursive-include tests *.py
 recursive-include tools *.py
 recursive-include docs *.md *.mmd *.svg
 recursive-include library *.json
-recursive-include .github/workflows *.yml
+recursive-include .github *.yml
 global-exclude *.pyc *.pyo *.partial
 prune .venv
 prune .git
@@ -23,3 +22,6 @@ prune transcricao
 # Public synthetic demonstration assets only.
 recursive-include examples/synthetic *.md *.jpg *.png *.pdf *.xlsx *.json
 prune review
+
+# Internal maintenance records are kept in Git, outside published source archives.
+exclude AGENTS.md HANDOFF.md PLAN.md VALIDATION.md MANIFEST.sha256

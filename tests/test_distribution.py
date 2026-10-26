@@ -14,7 +14,9 @@ class DistributionTests(unittest.TestCase):
     def wheel(self, folder, extra=None):
         target = Path(folder) / 'synthetic.whl'
         entries = {f'herbarium_labels/{name}.py': b'# synthetic module'
-                   for name in ('bryophytes', 'sennen', 'cache', 'catalog', 'legacy', 'demo')}
+                   for name in ('bryophytes', 'sennen', 'cache', 'catalog', 'legacy', 'demo', 'imaging', 'provider', 'profiles', 'pipeline',
+                                'pricing', 'errors', 'suggestions', 'cli', 'existing', 'report_messages',
+                                'sennen_suggestions')}
         entries.update({
             'herbarium_labels-0.1.0a2.dist-info/licenses/LICENSE': b'MIT License',
             'herbarium_labels-0.1.0a2.dist-info/licenses/NOTICE.md': b'Synthetic notice',

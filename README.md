@@ -1,99 +1,116 @@
 # herbarium-labels
 
-An open Python library for transcribing botanical labels and producing reviewable JSON, Excel, PDF, and ZIP files. It extracts workflows used in research and TSennen/Taxa, with results reviewed and accepted by researchers according to the maintainer. It complements Hespi and other tools.
+Transcribe botanical labels into structured JSON and create Excel, PDF, and ZIP deliveries for human review. Built from research workflows for PO/LISU bryophytes and F. Sennen sheets, with separate scientific contracts for each collection.
 
-## Current scope
+## Install
 
-Proposed English API alpha **0.1.0a2**, prepared as an unapplied patch for maintainer review. Code, commands, schemas, messages, and report interfaces are English; literal label text always retains its source language.
-
-- **Bryophytes:** PO/LISU-specific reading, JSON persistence, cache verification, and reports.
-- **Sennen:** full sheet plus lower crop, separate labels and structured fields through a Python API.
-- **Catalogue:** documentary validation of people, hands, samples, sources, and attributions; four uncurated drafts.
-- **Offline demonstration:** synthetic images and simulated responses, with delivery checks.
-
-Example retrieval, profile injection, automatic handwriting attribution, generic segmentation, and native review import are future work. English interfaces do not imply general paleographic accuracy for every collection. See [the architecture](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/ARCHITECTURE.md), [workflow](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/WORKFLOW.md), and [roadmap](https://github.com/MattyDroidX/herbarium-labels/blob/main/PLAN.md).
-
-## Install locally
-
-Requires Python 3.11+. From the reviewed source tree:
+Python 3.11+:
 
 ```sh
-python -m venv .venv
-# Linux/macOS:
-. .venv/bin/activate
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install --require-hashes -r requirements.lock
-python -m pip install --no-deps -e .
+python -m pip install "herbarium-labels[all]==0.1.0a3"
 ```
 
-The lock includes all extras and Pillow 13. An alternative is `python -m pip install -e ".[all]"`, which resolves declared version ranges. Extras: `claude`, `reports`, `heif`, and `all`. Local verification used Linux/Python 3.12; the configured remote matrix is not a claim of completed CI.
+This documentation describes **0.1.0a3**. The PyPI command applies after that version is published; before publication, install the reviewed source with `python -m pip install -e ".[all]"`. The previous alpha, [0.1.0a2](https://pypi.org/project/herbarium-labels/0.1.0a2/), is already published. Extras are `claude`, `reports`, `heif`, and `all`.
 
-Source destination: [MattyDroidX/herbarium-labels](https://github.com/MattyDroidX/herbarium-labels). No TestPyPI/PyPI upload is claimed. The wheel contains runtime modules; the repository/source archive also include documentation, tests, tools, and the draft catalogue.
+The declared compatibility floor is Pillow 11.3; the recommended hashed environment in `requirements.lock` uses Pillow 13. Compatibility with an older version does not mean it contains current security fixes. The Pillow 11.3 test is a functional integration check, not a recommendation to downgrade.
 
-## Try the entire delivery offline
+## Try it offline
 
-No API key, network connection, or real collection images are needed:
+No API key, network connection, or collection images are needed:
 
 ```sh
 python -m herbarium_labels demo --output ./demo-output --pdf
-python -m unittest discover -s tests -v
 ```
 
-Use a new directory for each demo. Open `demo-output/verification.json`: `all_passed` should be `true`. Inspect `demo-output/input/transcription/transcriptions.xlsx`, `review.pdf`, and `demo-output/input/transcriptions.zip`. The mock supplies known fixture readings; this demonstrates the pipeline, not OCR/paleographic quality. [The testing guide](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/TESTING.md) explains every artifact and check.
+Use a new directory. Open `verification.json`, `input/transcription/transcriptions.xlsx`, `input/transcription/review.pdf`, and `input/transcriptions.zip` inside it. This uses simulated readings to demonstrate delivery; it does not measure transcription accuracy. [Checked-in synthetic examples](examples/synthetic/README.md) can be opened without running Python.
 
-## Transcribe authorized images
+## Choose a collection profile
 
-Set `ANTHROPIC_API_KEY` privately in the environment. `.env.example` is a reference, not automatically loaded configuration. `TRANSCRIPTION_MODEL` selects the model; verify availability before a paid run. Optional input/output prices are USD per million tokens; without both, estimated cost is unknown.
+The same CLI supports both built-in workflows and installed profile extensions:
 
 ```sh
-herbarium-labels transcribe --images ./input --output ./output
-herbarium-labels report --images ./input --output ./output
-herbarium-labels batch --images ./input --pdf
+herbarium-labels batch --profile po-bryophytes --images ./input --pdf
+herbarium-labels batch --profile sennen --images ./sheets --pdf
 ```
 
-`python -m herbarium_labels` is equivalent. `transcribe` writes readings; `report` creates reports without an API request; `batch` requires a reading for every input, then produces a delivery ZIP. Its fixed output directory is `input/transcription/`; the archive is `input/transcriptions.zip`. Originals are unchanged.
+`po-bryophytes` remains the default for existing commands. `sennen` sends the full sheet plus a lower-label crop and preserves separate labels. These are collection-specific readers, not general handwriting recognition.
 
-Inputs are nonrecursive JPG, JPEG, PNG, HEIC, or HEIF files. HEIF requires its extra. Duplicate stems are rejected. New JSON uses English keys and schema version `0.2.0`. Existing Portuguese JSON is normalized in memory for reading/reporting without changing its bytes. The old Python module/CLI names have been renamed; see [migration](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/MIGRATION.md).
+Before a live run, set `ANTHROPIC_API_KEY` privately in your environment and choose an available `TRANSCRIPTION_MODEL`. `.env.example` is a reference and is not loaded automatically. Input images must be authorized for the provider; start with a small selection and a defined budget. Optional `TRANSCRIPTION_PRICE_IN` and `TRANSCRIPTION_PRICE_OUT` are USD per million tokens; costs remain unknown without them.
 
-## Resume without replacing human work
+```sh
+herbarium-labels transcribe --profile sennen --images ./input --output ./output --limit 1 --workers 1
+herbarium-labels report --profile sennen --images ./input --output ./output
+```
 
-Cache identity includes image/configuration hashes: prompt, model, schema, transformation, SDK, and codecs. The selected batch is checked before requests. Incompatible or unverifiable existing results stop transcription; preserve them and use a new output directory. Legacy results are not automatically promoted into verified cache.
+`report` works offline. `batch` writes `input/transcription/` and `input/transcriptions.zip`. Supported inputs are nonrecursive JPG, JPEG, PNG, HEIC, and HEIF; HEIF needs its extra. Duplicate filename stems are rejected. Originals are never modified.
 
-`.transcription.lock` prevents overlapping transcriptions/batches; an existing legacy lock also blocks a new run. Check for an active process before removing stale locks. Standalone `report` must run without another writer. Lost responses may require another paid request; exactly-once execution is not guaranteed.
-
-## Process a Sennen sheet
+## Use it from Python
 
 ```python
 from pathlib import Path
-from herbarium_labels.sennen import read_labels
+from herbarium_labels import TranscriptionOptions, read_image
 
-reading, usage = read_labels(Path("sheet.jpg").read_bytes())
+reading, usage = read_image(
+    Path("sheet.jpg").read_bytes(),
+    profile="sennen",
+    options=TranscriptionOptions(model="YOUR_AVAILABLE_MODEL", max_retries=0),
+)
 for label in reading.labels:
     print(label.origin, label.literal_text)
 ```
 
-The collection-specific lower crop complements the full sheet. The function returns suggestions/readings, not database edits or human approval. See [architecture](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/ARCHITECTURE.md) for the independent catalogue and host-review boundaries.
+Clients, model settings, request limiting, field mapping, and review translations are caller-configurable. See [integration examples](docs/INTEGRATION.md) for Taxa's `cota` mapping and host-owned translations. These extension options require 0.1.0a3; the published 0.1.0a2 exposes `sennen.read_labels(content, client=None)`.
 
-## Validate and build
+## Process folders from Python
 
-```sh
-python -m unittest discover -s tests -v
-python -m pip install --require-hashes -r requirements-dev.lock
-python -m build --no-isolation
-python -m twine check --strict dist/*
-python tools/check_dist.py dist/*
+The Python API takes paths and keyword arguments directly:
+
+```python
+from herbarium_labels import TokenPrices, TranscriptionOptions, transcribe_folder, create_report
+
+options = TranscriptionOptions(model=selected_model, max_retries=2,
+    prices=TokenPrices(input_rate, output_rate, model=selected_model))
+totals = transcribe_folder("input", "output", profile="sennen", options=options, limit=1)
+reports = create_report("input", "output", profile="sennen", messages=report_translations)
 ```
 
-See [testing](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/TESTING.md), [validation records](https://github.com/MattyDroidX/herbarium-labels/blob/main/VALIDATION.md), [contribution instructions](https://github.com/MattyDroidX/herbarium-labels/blob/main/CONTRIBUTING.md), and [maintainer-controlled publication](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/PUBLISHING.md). Only the maintainer applies changes, commits, or pushes unless explicitly delegated.
+`batch_folder` performs transcription and delivery together. Price precedence is `prices=` > `options.prices` > environment, and the selected rates apply to both stages without modifying the supplied options. For separate calls, use `options.prices` for transcription and pass the same object as `create_report(..., prices=options.prices)`. `register_profile` adds a Python profile in the current process; installed packages can advertise profiles to the CLI through `herbarium_labels.profiles` entry points. Run `herbarium-labels profiles` to list names. See the [integration guide](docs/INTEGRATION.md) for complete contracts and plugin metadata.
 
-## Scientific safeguards and rights
+Report messages may be a mapping or callback. For a Portuguese PO/LISU report:
 
-Preserve literal spelling, line breaks, and uncertainties; normalization is separate. Institution, collector, determiner, taxonomic author, and writer are distinct roles. Draft profiles do not establish authorship. See [handwriting curation](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/HANDWRITING.md) and [practical evidence](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/EVIDENCE.md).
+```sh
+herbarium-labels report --profile po-bryophytes --images ./input --output ./output \
+  --messages-json examples/synthetic/report-messages-po-pt.json
+```
 
-Prompt instructions were translated for the English API. Their policies are documented and tested structurally, but equivalent scientific performance has not been demonstrated by the offline suite. Live evaluation needs permitted images and a defined budget; see [prompt changes](https://github.com/MattyDroidX/herbarium-labels/blob/main/docs/PROMPT_CHANGES.md).
+Only presentation changes; literal labels and uncertainties retain their source text. [Portuguese synthetic report examples](examples/synthetic/README.md) include Excel/PDF and a preview.
 
-Code is MIT-licensed; [LICENSE](https://github.com/MattyDroidX/herbarium-labels/blob/main/LICENSE) and [NOTICE.md](https://github.com/MattyDroidX/herbarium-labels/blob/main/NOTICE.md) preserve provenance. Image/API/redistribution rights are independent. A live provider run, real HEIF decoding, and complete long/Unicode report validation remain pending; see [security](https://github.com/MattyDroidX/herbarium-labels/blob/main/SECURITY.md) and [validation limits](https://github.com/MattyDroidX/herbarium-labels/blob/main/VALIDATION.md).
+## Continue a legacy output folder
 
-## Checked-in demonstration files
+For an older batch whose existing JSON is in `input/transcricao/json/`, select that output folder explicitly:
 
-Open [examples/synthetic/README.md](examples/synthetic/README.md) to inspect the synthetic input image, rendered PNG preview, PDF, workbook, JSON, and verification results directly from the repository. These are simulated fixtures, not research or OCR-quality evidence.
+```sh
+herbarium-labels batch --profile po-bryophytes --images ./input \
+  --output ./input/transcricao --accept-existing --pdf \
+  --messages-json examples/synthetic/report-messages-po-pt.json
+```
+
+`--accept-existing` does not search for or rename old folders. Without `--output`, the default is `input/transcription/`. The example preserves existing JSON and writes the delivery archive to `input/transcricao.zip`. New photographs still require an authorized provider request.
+
+## Review and reuse
+
+Literal spelling, line breaks, and uncertainty remain distinct from interpretation. Suggestions never edit a database or approve a reading. Code is MIT-licensed; image, API-use, and redistribution rights remain separate. Preserve [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
+
+Cache identity includes the profile, prompt, model, schema, image policy, and codecs. Strict reuse is the default. To continue a reviewed older folder, explicitly use `--accept-existing`; an acceptance ledger preserves the original JSON and records its association with the current image. Recorded image mismatches and invalid readings remain blocked. See [continuing older folders](docs/INTEGRATION.md#continue-an-older-reviewed-folder).
+
+## Develop
+
+```sh
+python -m pip install --require-hashes -r requirements.lock
+python -m pip install --no-deps -e .
+python -m unittest discover -s tests -v
+```
+
+See [testing](docs/TESTING.md), [contributing](CONTRIBUTING.md), [architecture](docs/ARCHITECTURE.md), [workflow](docs/WORKFLOW.md), [migration](docs/MIGRATION.md), and [publishing](docs/PUBLISHING.md). Research provenance and evaluation limits are documented in [EVIDENCE.md](docs/EVIDENCE.md). Live evaluation of this extracted alpha, broad Unicode/long-text report coverage, and curated handwriting attribution remain ongoing work.
+
+The separately hashed `requirements-compat.lock` selects Pillow 11.3 for functional compatibility checks; `requirements.lock` remains the recommended current environment.

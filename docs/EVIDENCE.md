@@ -14,6 +14,20 @@ These are historical records, not experiments repeated during extraction or rele
 
 A delivered workbook was inspected read-only: 549 records on each of two sheets, 549 embedded images, literal text in every record, 306 records with explicit uncertainties, no formula cells, and 549 existing local links per sheet. Samples from the beginning, middle, and end were read. This was not a complete paleographic review; 306 uncertainties do not mean 306 confirmed errors. The original workbook was neither modified nor packaged.
 
-The extracted modules and tests were inspected. Sennen sends the full sheet and a crop and returns separate labels. Offline tests use synthetic images and simulated providers, including mock HTTP transport through the installed SDK. See [VALIDATION.md](../VALIDATION.md) for current checks and limitations.
+The extracted modules and tests were inspected. Sennen sends the full sheet and a crop and returns separate labels. Offline tests use synthetic images and simulated providers, including mock HTTP transport through the installed SDK. See [VALIDATION.md](https://github.com/MattyDroidX/herbarium-labels/blob/main/VALIDATION.md) for current checks and limitations.
 
 Docker/localhost were inaccessible in the original extraction session. This limitation is historical, not a current defect claim. No paid API call or modification of the research environment has been made during this preparation.
+
+## Maintainer-reported Taxa equivalence — 2026-10-26
+
+After applying the reuse proposal, the maintainer ran the 61-test suite and a separate equivalence check using Taxa's Pillow 11.3, `field_map={"shelfmark": "cota"}`, and Portuguese review-message templates. They reported exactly matching suggestions against the current `app/transcription.py` in three cases: shelfmark spacing, a date in Roman numerals, and reading uncertainties.
+
+This is evidence for that host integration and those three cases. The private test fixtures/application were not supplied or independently executed in this session, and the result is not generalized to every field, collection, or live model. The follow-up retains the suggestion comparison rules and adds synthetic regressions for the reported scenarios.
+
+## Independent maintainer release verification — 2026-10-26
+
+The maintainer subsequently reported independent verification of all six integration contracts: plain path-based Python calls and old adapters, an external `meu-herbario` package discovered only through entry points in a separate environment, duplicate `sennen` rejection, Portuguese report presentation, unchanged Taxa suggestion results/imports with options-derived model labels, and explicit prices/retries/Excel text safety.
+
+On a copy of six photographs from a real research batch, five had old JSON without image hashes. With a simulated counting client, strict mode stopped with zero requests; explicit acceptance requested only the new photograph, preserved all five JSON files byte for byte, and marked historical associations unverified. The next run reused all six with no requests. The originals were untouched and no paid requests were made. These private photographs/results are not included in the repository.
+
+The supplied-rate cost calculation was USD 0.0825, not a provider charge. The maintainer's 83-test suite passed on source with Pillow 13 and the installed package with Pillow 11.3; the latter initially skipped one SDK test because the optional `claude` extra was missing. That test then passed with Taxa's Anthropic 1.17/Pillow 11.3 interpreter. The assistant did not independently run the private application or those six-image fixtures; its release-polish suite uses synthetic data and includes one additional batch-price-precedence regression.

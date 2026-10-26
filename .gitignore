@@ -38,3 +38,10 @@ testpypi-wheel/
 !examples/synthetic/README.md
 !examples/synthetic/sheet_reading.json
 !examples/synthetic/verification.json
+
+# Public translated synthetic report fixtures and message catalogues.
+!examples/synthetic/portuguese/
+!examples/synthetic/portuguese/output/
+!examples/synthetic/portuguese/output/**
+!examples/synthetic/portuguese/review-preview.png
+!examples/synthetic/report-messages-*-pt.json

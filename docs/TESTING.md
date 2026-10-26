@@ -22,7 +22,7 @@ Use `--images` for an input directory and `--output` for transcription/report ou
 python -m unittest discover -s tests -v
 ```
 
-Expected result for the reviewed English proposal: 42 tests and `OK`, without a real API key. The SDK contract test needs the `claude` extra; it uses mock HTTP transport, not the provider service. Full-suite reporting/demo tests need the `reports` extra. Installing the runtime lock provides both. `PYTHONPATH=src` is available for source-only development but must be unset when checking a wheel.
+Expected result for the reviewed reuse proposal: 84 tests and `OK`, without a real API key. The SDK contract test needs the `claude` extra; it uses mock HTTP transport, not the provider service. Full-suite reporting/demo tests need the `reports` extra. Installing the runtime lock provides both. `PYTHONPATH=src` is available for source-only development but must be unset when checking a wheel.
 
 | Test file | Main evidence |
 | --- | --- |
@@ -90,7 +90,7 @@ python -m twine check --strict dist/*
 python tools/check_dist.py dist/*
 python -m venv .wheel-venv
 .wheel-venv/bin/python -m pip install --require-hashes -r requirements.lock
-.wheel-venv/bin/python -m pip install --no-deps dist/herbarium_labels-0.1.0a2-py3-none-any.whl
+.wheel-venv/bin/python -m pip install --no-deps dist/herbarium_labels-0.1.0a3-py3-none-any.whl
 .wheel-venv/bin/python -m unittest discover -s tests -v
 .wheel-venv/bin/python -m herbarium_labels demo --output ./wheel-demo --pdf
 ```
@@ -121,3 +121,21 @@ print(len(catalog.samples), len(catalog.attributions))  # 0, 0
 ```
 
 A valid schema confirms structure and references. It does not establish who wrote a label, clear image rights, or make a draft profile suitable for automatic selection. The catalogue is not currently inserted into either transcription prompt.
+
+## Reuse contract checks (proposed 0.1.0a3)
+
+Run `python -m unittest discover -s tests -v` on the reviewed source and installed wheel. `test_reuse.py` covers Taxa mappings on input/output, complete host translations, literal uncertainty preservation, missing-key errors, client ownership, per-call options, optional host limiting, EXIF/crop/no-upscaling behavior, custom profiles, Sennen cache/report/ZIP delivery, cross-profile cache rejection, human corrections, and CLI failure status.
+
+The standard lock uses Pillow 13. The separate Linux/Python 3.12 compatibility job installs Pillow 11.3.0, checks dependency consistency, and reruns the synthetic suite. It verifies functionality only. Ordinary tests make no paid requests and cannot establish paleographic equivalence or a security audit of old dependencies.
+
+Run `python tools/check_workflows.py` to reject movable action references. SHA provenance was checked against the upstream repositories; Dependabot proposes updates for maintainer review. YAML parsing and package-content checks remain separate checks.
+
+The separately hashed `requirements-compat.lock` selects Pillow 11.3 for functional compatibility checks; `requirements.lock` remains the recommended current environment.
+
+## Folder API follow-up
+
+`test_folder_api.py` covers normal Python parameters and artifact return values, CLI delegation, explicit prices/model labels, common retry defaults, process-local registration, lazy plugin discovery, duplicate/factory failures, an installed entry point exercised through a fresh CLI process, report-map/callback localization, Excel title validation, and explicit existing-reading acceptance. Acceptance tests preserve JSON bytes and historical models, reuse only old readings, transcribe only new photographs, block recorded/accepted image changes and invalid profiles, validate the full batch before saving acceptance, and retain explicit renewal history after human edits.
+
+The checked-in Portuguese synthetic delivery is a presentation example, not a real collection result. Original literal text remains unchanged. The maintainer separately reported matching Taxa suggestions for shelfmark spacing, Roman-numeral dates, and uncertainties; the private application/tests are not copied or changed here.
+
+The release-polish regression confirms that a batch-level price override reaches both transcription and report estimates while leaving the caller options unchanged.

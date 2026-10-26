@@ -1,129 +1,129 @@
-# Testing, building, and publishing
+# Release 0.1.0a3
 
-The maintainer selected `MattyDroidX/herbarium-labels` and GitHub plus TestPyPI followed by PyPI. The proposed English API version is `0.1.0a2` (transcription/catalogue schema `0.2.0`). The SSH remote is `git@github.com:MattyDroidX/herbarium-labels.git`.
+This guide prepares and publishes `herbarium-labels==0.1.0a3`. Version 0.1.0a2 is the preceding published alpha. Publication remains a maintainer action; the assistant does not apply patches, commit, push, tag, or upload unless explicitly authorized.
 
-**Maintainer control:** only the maintainer applies repository changes, commits, tags, pushes, or initiates publication unless they explicitly delegate an action. Commands below are instructions for the maintainer, not authorization for an assistant to execute them. An assistant can prepare patches and test isolated copies without applying changes to this repository.
+The release uses the existing `publish.yml` Trusted Publishers and GitHub environments `testpypi` and `pypi`. Their repository is `MattyDroidX/herbarium-labels`; workflow filename is `publish.yml`. The workflow requires a tag matching the package version. No API-token secret or Anthropic key is required for publication or ordinary offline tests.
 
-## 1. Review the release scope
+Commands below use Linux/macOS/WSL paths. On native Windows, replace virtual-environment `bin/python` with `Scripts/python.exe`. Run commands from the repository root.
 
-This alpha shares two existing transcription workflows and documentary catalogue models. It does not implement automatic handwriting attribution, example retrieval, a review interface, or the planned v2 schema. Preserve the research-use evidence and its limits in [EVIDENCE.md](EVIDENCE.md).
+## 1. Apply, review, and verify the release tree
 
-Documentation is English. The proposed English API renames CLI commands, fields, enum values, and report labels; prompt instructions are translated with original-language evidence preserved. Read `MIGRATION.md` and `PROMPT_CHANGES.md`. Legacy JSON remains readable without rewriting it. The wheel contains runtime modules and license notices; the source distribution also includes documentation, tests, tools, and the draft catalogue. It contains no collection images or private research results.
-
-Review any proposed patch before applying it. The Pillow 13 requirement and regenerated lock are part of the current review proposal, following advisory findings for Pillow 12.3.0. A change in codec version invalidates content/configuration cache reuse and requires a fresh transcription output directory.
-
-## 2. Install and test locally
-
-From an applied and reviewed source tree, create a virtual environment and activate it using the instructions in [README.md](../README.md):
+Apply the reviewed incremental patch yourself, then verify the tree. The full runtime lock installs optional SDK/report dependencies, so the SDK contract test can run too.
 
 ```sh
 python -m pip install --require-hashes -r requirements.lock
-python -m pip install --no-deps -e .
-python -m unittest discover -s tests -v
-```
-
-Ordinary tests are offline, use synthetic images, and simulate the provider, including the installed SDK's HTTP transport. No real key is needed. Run `python -m herbarium_labels demo --output ./demo-output --pdf` to inspect a full synthetic delivery; see `TESTING.md`. Record actual results in [VALIDATION.md](../VALIDATION.md). The configured CI matrix requests Linux and Windows with Python 3.11–3.14; local preparation alone does not establish those remote results.
-
-A live transcription is a separate integration check. Select permitted images, verify the configured model and prices, and define a spending limit before running it. Do not silently reuse a private application's key or images. Until performed, describe live provider behavior and real HEIF decoding as unverified in this extracted alpha.
-
-## 3. Build and inspect distributions
-
-```sh
 python -m pip install --require-hashes -r requirements-dev.lock
-python -m build --no-isolation
-python -m twine check --strict dist/*
-python tools/check_dist.py dist/*
-python -m pip_audit -r requirements.lock --require-hashes --disable-pip
-python -m pip_audit -r requirements-dev.lock --require-hashes --disable-pip
+python -m pip install --no-build-isolation --no-deps -e .
+python -m pip check
+python -m unittest discover -s tests -v
+python tools/check_workflows.py
+python -m build --no-isolation --outdir dist/0.1.0a3
+python -m twine check --strict dist/0.1.0a3/*
+python tools/check_dist.py dist/0.1.0a3/*
 ```
 
-The development lock includes the tested setuptools backend. `--no-isolation` uses those locked build tools; a default isolated build may resolve another allowed backend version. Dependency auditing contacts public advisory services, unlike ordinary offline tests. Inspect findings rather than suppressing them to obtain a passing result.
+The expected suite contains 84 tests with the required extras installed. Read any skip reasons. Use the versioned artifact folder above so older local releases are not included accidentally. Inspect metadata/licenses, dependency locks, allowed contents, synthetic examples, and source hashes; preserve LICENSE and NOTICE.md. `check_dist.py` is a limited structural/credential-pattern check, not a complete security audit. Dependency audits can be run with `python -m pip_audit -r requirements.lock --require-hashes --disable-pip` and the equivalent development lock command; inspect actual findings.
 
-`MANIFEST.in` declares source-distribution inputs. `tools/check_dist.py` checks allowed paths, required modules/license notices, metadata, archive integrity, and common credential patterns without extraction. Review the actual member list as well; this limited scanner does not replace an external audit.
+Before tagging, ensure README documents the intended version and distinguishes the published package from source-only features. Do not claim remote CI results or uploads until confirmed. The public-file manifest excludes itself and generated/private files and must match the reviewed tree.
 
-Rebuild after documentation or metadata changes. Refresh `MANIFEST.sha256` from the explicit public-file list, excluding the manifest itself and all generated/private files. Do not treat an old distribution manifest as hashes of a new source tree.
+## 2. Commit and push the reviewed source
 
-## 4. Test the installed wheel
-
-Use a fresh environment that has never installed the source tree in editable mode:
+Review the changed files before staging. These commands stage the tracked release changes/deletions plus the known public additions; ignored environments and local datasets remain outside the commit.
 
 ```sh
-python -m venv .wheel-venv
-.wheel-venv/bin/python -m pip install --require-hashes -r requirements.lock
-.wheel-venv/bin/python -m pip install --no-deps dist/*.whl
-.wheel-venv/bin/python -m unittest discover -s tests -v
-.wheel-venv/bin/python -m herbarium_labels --help
-```
-
-These shell commands use Linux/macOS paths; on Windows use `.wheel-venv\Scripts\python.exe` and the exact wheel filename. Check `herbarium_labels.__file__` to confirm imports come from that environment's `site-packages`, not `src/`. Tests do not insert the source directory automatically.
-
-Check the source distribution too: build its wheel in isolation or in a clean copy with the locked backend. Do not trust an editable-install-only test as evidence that a wheel contains the required modules.
-
-## 5. Review and publish source on GitHub
-
-Preserve the existing Git repository and any remote history. Do not reinitialize it or force-push. Before the first commit, review the public-file list, secrets, license/provenance, package contents, author identity, and test results. The maintainer then stages only intended public files and creates the commit.
-
-The configured remote is already `origin`. The maintainer can verify it and inspect remote branches before pushing:
-
-```sh
-git remote -v
-git ls-remote --heads origin
 git status --short
-# After reviewing and committing the intended files:
-git push -u origin main
+git add -u
+git add -- .github docs examples/synthetic src tests tools requirements-compat.lock
+git --no-pager diff --cached --stat
+git diff --cached --check
+git commit
+git push origin main
 ```
 
-No commit/push is implied by this guide. Resolve existing remote content without overwriting it. After the maintainer's push, inspect the actual Actions results. Enable the repository's private vulnerability-reporting feature and update `SECURITY.md` with the verified route. Configure repository protections appropriate to the maintainer's workflow.
+Suggested subject: `feat: make transcription workflows reusable across host applications`.
 
-## 6. Configure Trusted Publishing
-
-Create/use accounts on TestPyPI and PyPI; they are independent services. Do not share passwords, API tokens, SSH private keys, or recovery codes in chat or commit them.
-
-For a new project, configure a pending GitHub Trusted Publisher on each index. A pending publisher does not reserve the package name; verify name availability when publishing. Use these exact settings:
-
-| Setting | TestPyPI | PyPI |
-| --- | --- | --- |
-| Project name | `herbarium-labels` | `herbarium-labels` |
-| GitHub owner | `MattyDroidX` | `MattyDroidX` |
-| Repository | `herbarium-labels` | `herbarium-labels` |
-| Workflow filename | `publish.yml` | `publish.yml` |
-| GitHub environment | `testpypi` | `pypi` |
-
-Create matching GitHub environments. The manual workflow requests `id-token: write` only in the publishing job and uses PyPA's publishing action. It does not store a long-lived PyPI token. See [PyPI's new-project instructions](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/) and [publishing workflow documentation](https://docs.pypi.org/trusted-publishers/using-a-publisher/).
-
-## 7. Validate on TestPyPI
-
-After applying/reviewing changes, passing CI, and selecting the release commit, the maintainer creates and pushes `v0.1.0a2`. The workflow requires a tag exactly matching `pyproject.toml`'s version; running it on `main` fails before publication.
-
-The workflow file must already be on the default branch. The maintainer can run it for the tag using GitHub CLI, if installed/authenticated:
+Inspect the actual CI run for this commit before continuing. Disable the GitHub CLI pager to avoid the suspended-pager behavior previously observed:
 
 ```sh
-gh workflow run publish.yml --ref v0.1.0a2 -f target=testpypi
+export GH_PAGER=cat
+gh run list --workflow tests.yml --branch main --limit 5
 ```
 
-This is a manual publication action. The workflow builds wheel/source archives, checks them, tests the installed wheel, and uploads to TestPyPI only when the selected target is `testpypi`.
+Use `gh run watch RUN_ID --exit-status` with the displayed run ID, or inspect the run in GitHub Actions. Continue only after the matching commit's required jobs succeed. No successful remote matrix run is inferred from local tests.
 
-Test the uploaded package rather than substituting a local wheel. Download only this project from TestPyPI, then resolve runtime dependencies from the reviewed lock/public PyPI in a fresh environment:
+## 3. Create the new release tag
 
 ```sh
-python -m pip download --index-url https://test.pypi.org/simple/ --no-deps --only-binary=:all: --dest testpypi-wheel 'herbarium-labels==0.1.0a2'
-python -m venv .testpypi-venv
-.testpypi-venv/bin/python -m pip install --require-hashes -r requirements.lock
-.testpypi-venv/bin/python -m pip install --no-deps testpypi-wheel/*.whl
-.testpypi-venv/bin/python -m herbarium_labels --help
-.testpypi-venv/bin/python -m unittest discover -s tests -v
+git tag -a v0.1.0a3 -m "herbarium-labels 0.1.0a3"
+git push origin v0.1.0a3
 ```
 
-Use exact wheel paths and `Scripts/python.exe` on Windows. This avoids mixing dependency resolution between package indexes. Record the real TestPyPI URL, version, artifact hashes, and test results. Uploading an existing filename/version again is not a repair mechanism; increment the version when a correction requires a new release.
+The tag must point to the reviewed commit. Keep `v0.1.0a2` intact; do not force or move published tags. A correction after uploading a version requires another version.
 
-## 8. Publish the alpha on PyPI
-
-Only after the TestPyPI installation checks and review, the maintainer triggers the same tagged source with `target=pypi`:
+## 4. Publish to TestPyPI
 
 ```sh
-gh workflow run publish.yml --ref v0.1.0a2 -f target=pypi
+gh workflow run publish.yml --ref v0.1.0a3 -f target=testpypi
+gh run list --workflow publish.yml --branch v0.1.0a3 --limit 5
 ```
 
-Each manual run rebuilds from that tag; do not claim identical archive hashes unless measured. Verify the actual PyPI page, fresh-environment installation, module/CLI imports, and release notes. Alpha releases use prerelease versions; an exact version such as `herbarium-labels[all]==0.1.0a2` selects it explicitly.
+Wait for the TestPyPI run to finish successfully before downloading. The workflow builds wheel/source archives, checks them, tests the installed wheel, and publishes only to the selected index. Run listing is read-only; do not trigger another upload just to inspect status.
 
-Publish GitHub release notes with the actual artifacts/results and known limitations. Record URLs/CI runs only after success. No TestPyPI or PyPI upload has been made by this preparation.
+## 5. Test the actual TestPyPI wheel
+
+Use new environment/demo directories. Download only this package from TestPyPI, install its reviewed dependencies separately, and unset `PYTHONPATH` when checking the installed wheel:
+
+```sh
+python -m pip download --index-url https://test.pypi.org/simple/ \
+  --no-deps --only-binary=:all: --dest dist/testpypi-0.1.0a3 \
+  "herbarium-labels==0.1.0a3"
+python -m venv data/release-a3-testpypi
+data/release-a3-testpypi/bin/python -m pip install --require-hashes -r requirements.lock
+data/release-a3-testpypi/bin/python -m pip install --no-deps \
+  dist/testpypi-0.1.0a3/herbarium_labels-0.1.0a3-py3-none-any.whl
+data/release-a3-testpypi/bin/python -m pip check
+env -u PYTHONPATH data/release-a3-testpypi/bin/python -m unittest discover -s tests -v
+env -u PYTHONPATH data/release-a3-testpypi/bin/python -m herbarium_labels profiles
+env -u PYTHONPATH data/release-a3-testpypi/bin/python -m herbarium_labels demo \
+  --output data/release-a3-testpypi-demo --pdf
+```
+
+Expect 84 passing tests and demo verification with `all_passed: true`. The demo and mock SDK tests make no paid requests. Confirm imports resolve to the new environment's `site-packages` if needed. TestPyPI and PyPI are separate services; using `--index-url` explicitly selects the index, while the separate lock installation avoids mixing dependency resolution between them.
+
+## 6. Publish to PyPI
+
+After the uploaded TestPyPI wheel passes validation:
+
+```sh
+gh workflow run publish.yml --ref v0.1.0a3 -f target=pypi
+gh run list --workflow publish.yml --branch v0.1.0a3 --limit 5
+```
+
+Wait for this production run to finish successfully. Each workflow run rebuilds from the tag; identical source does not by itself establish identical archive hashes. Record actual URLs, artifact hashes, CI results, and remaining limitations after publication.
+
+## 7. Verify installation from production
+
+```sh
+python -m venv data/release-a3-pypi
+data/release-a3-pypi/bin/python -m pip install --index-url https://pypi.org/simple/ \
+  "herbarium-labels[all]==0.1.0a3"
+data/release-a3-pypi/bin/python -m pip check
+env -u PYTHONPATH data/release-a3-pypi/bin/python -m herbarium_labels profiles
+env -u PYTHONPATH data/release-a3-pypi/bin/python -m unittest discover -s tests -v
+```
+
+Check the published project page and release notes. A GitHub prerelease may then be created from the verified tag with `gh release create v0.1.0a3 --verify-tag --prerelease --title "herbarium-labels 0.1.0a3" --notes-file RELEASE_NOTES_FILE`, substituting the reviewed notes file.
+
+## Existing research folders
+
+Publication does not migrate real data or replace the private Taxa application. To continue a legacy batch, explicitly select its actual output folder:
+
+```sh
+herbarium-labels batch --profile po-bryophytes --images ./input \
+  --output ./input/transcricao --accept-existing --pdf \
+  --messages-json examples/synthetic/report-messages-po-pt.json
+```
+
+Acceptance preserves old JSON and records historical-source verification separately. It does not import Excel-only edits or bypass recorded image mismatches. New photographs require authorized API use and a budget; this is separate from release verification.
+
+Reference: [GitHub CLI workflow dispatch](https://cli.github.com/manual/gh_workflow_run), [TestPyPI usage](https://packaging.python.org/en/latest/guides/using-testpypi/), and [Trusted Publishing](https://docs.pypi.org/trusted-publishers/using-a-publisher/).

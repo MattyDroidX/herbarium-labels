@@ -1,19 +1,17 @@
 flowchart LR
-    Input["Original images: unchanged"] --> CLI["CLI: transcribe / batch"]
-    CLI --> Bryophytes["bryophytes.py: prepare and validate"]
-    Bryophytes --> Cache["cache.py: content/config hashes and output lock"]
-    Cache --> Provider["Claude provider: live calls only outside demo"]
-    Provider --> Reading["BryophyteReading: English fields"]
-    Reading --> JSON["Atomic JSON persistence"]
-    JSON --> Report["CLI report: offline Excel / PDF"]
-    Legacy["legacy.py: read old JSON in memory"] --> Report
-    Report --> ZIP["batch: checked ZIP with relative image links"]
-    Report --> Human["Human review outside the library"]
-    Input --> Sheets["Python API: sennen.read_labels"]
-    Sheets --> Crop["Full sheet plus lower crop"]
-    Crop --> Provider
-    Provider --> SheetReading["SheetReading: labels remain separate"]
-    SheetReading --> Host["Host application review; no database writes"]
-    Demo["CLI demo: synthetic images and simulated provider"] --> Bryophytes
-    Demo --> Sheets
-    Catalog["catalog.py and library/: documentary validation only"]
+    Input["Original images: unchanged"] --> Imaging["imaging.py: EXIF / RGB / thumbnail; no upscaling"]
+    Profiles["profiles.py: built-ins / registry / installed entry points"] --> Imaging
+    Profiles --> Provider["provider.py: schema + prompt + explicit options/client"]
+    Imaging --> Provider
+    Host["Host: key/client, optional request context"] --> Provider
+    Provider --> Reading["Validated reading + usage; separate labels preserved"]
+    Input --> Cache["cache.py: image/config identity + output lock"]
+    Profiles --> Cache
+    Cache --> Pipeline["pipeline.py: preflight / request / atomic JSON"]
+    Provider --> Pipeline
+    Pipeline --> Report["Shared offline Excel / PDF / ZIP"]
+    Reading --> Suggestions["suggestions.py: canonical field comparisons"]
+    Mapping["Host field map + review/report translations"] --> Suggestions
+    Suggestions --> Review["Host human review; no automatic database edits"]
+    Report --> Review
+    Catalog["catalog.py + library/: independent documentary validation"]

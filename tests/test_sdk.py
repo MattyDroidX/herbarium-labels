@@ -48,7 +48,8 @@ class SDKTests(unittest.TestCase):
                                  http_client=httpx2.Client(transport=transport)) as client:
             with tempfile.TemporaryDirectory() as folder, \
                     patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'unit-test-placeholder'}), \
-                    patch.object(anthropic, 'Anthropic', return_value=client):
+                    patch.object(anthropic, 'Anthropic', return_value=client), \
+                    patch.object(client, 'close') as close:
                 root = Path(folder)
                 image = root / 'demo.jpg'
                 Image.new('RGB', (100, 200), 'white').save(image)
@@ -56,6 +57,7 @@ class SDKTests(unittest.TestCase):
                                                       limit=None, sample=False))
                 self.assertEqual((totals.photos, totals.input_tokens, totals.output_tokens), (1, 10, 20))
                 reading, usage = s.read_labels(image.read_bytes(), client=client)
+                close.assert_called_once()  # Only the internally created batch client is closed.
                 self.assertEqual(len(reading.labels), 2)
                 self.assertEqual(usage, {'input_tokens': 10, 'output_tokens': 20})
         self.assertEqual(len(requests), 2)

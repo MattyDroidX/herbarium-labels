@@ -10,9 +10,9 @@ import zipfile
 
 ROOT_FILES = {
     'LICENSE', 'NOTICE.md', 'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md',
-    'SECURITY.md', 'AGENTS.md', 'HANDOFF.md', 'PLAN.md', 'VALIDATION.md',
-    'pyproject.toml', 'MANIFEST.in', 'MANIFEST.sha256', 'PKG-INFO', 'setup.cfg',
-    'requirements.lock', 'requirements-dev.in', 'requirements-dev.lock', '.env.example', '.gitignore',
+    'SECURITY.md',
+    'pyproject.toml', 'MANIFEST.in', 'PKG-INFO', 'setup.cfg',
+    'requirements.lock', 'requirements-compat.lock', 'requirements-dev.in', 'requirements-dev.lock', '.env.example', '.gitignore',
 }
 SECRET = re.compile(
     rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----'
@@ -36,7 +36,7 @@ def allowed_source(path):
             or (parts[0] == 'docs' and path.suffix in {'.md', '.mmd', '.svg'})
             or (parts[:2] == ('examples', 'synthetic') and path.suffix in {'.md', '.jpg', '.png', '.pdf', '.xlsx', '.json'})
             or (parts[0] == 'library' and path.suffix == '.json')
-            or (parts[:2] == ('.github', 'workflows') and path.suffix == '.yml'))
+            or ((parts[:2] == ('.github', 'workflows') or parts == ('.github', 'dependabot.yml')) and path.suffix == '.yml'))
 
 
 def allowed_wheel(path):
@@ -97,7 +97,9 @@ def check(archive):
     if not wheel and len(roots) != 1:
         raise ValueError('Source distribution must have one root directory')
     names = {path.name for path in seen}
-    required = {'LICENSE', 'NOTICE.md', 'bryophytes.py', 'sennen.py', 'cache.py', 'catalog.py', 'legacy.py', 'demo.py'}
+    required = {'LICENSE', 'NOTICE.md', 'bryophytes.py', 'sennen.py', 'cache.py', 'catalog.py', 'legacy.py', 'demo.py',
+                'imaging.py', 'provider.py', 'profiles.py', 'pipeline.py', 'pricing.py', 'errors.py', 'suggestions.py', 'cli.py',
+                'existing.py', 'report_messages.py', 'sennen_suggestions.py'}
     if not wheel:
         required |= {'README.md', 'catalog.json', 'catalog.schema.json', 'requirements.lock'}
     if required - names:

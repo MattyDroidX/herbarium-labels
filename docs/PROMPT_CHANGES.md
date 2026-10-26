@@ -1,6 +1,6 @@
 # English prompt translation and evaluation limits
 
-The original extraction preserved its scientific prompts byte-for-byte at the Python-string level. At the maintainer's request for English code/interfaces, the `0.1.0a2` proposal translates the instruction language and field references. This is an intentional prompt change; the earlier unchanged-prompt check does not apply to this revision.
+The original extraction preserved its scientific prompts byte-for-byte at the Python-string level. At the maintainer's request for English code/interfaces, the published `0.1.0a2` translates the instruction language and field references. This is an intentional prompt change; the earlier unchanged-prompt check does not apply to this revision.
 
 ## What changes
 
@@ -37,3 +37,7 @@ The cache includes the prompt content, model, schema, transformations, SDK, and 
 Offline tests exercise the English schemas, exact request prompt payloads, response parsing, preserved legacy literals, separate labels, and report safety using simulated providers. They do not establish equivalent reading accuracy, date interpretation, or review time on real handwriting.
 
 The maintainer's reported research acceptance remains evidence for the original workflows in their use contexts. Do not transfer those results automatically to this translation. Before claiming equivalent scientific performance, compare original and translated prompts on the same authorized images/model, review the outputs, and report methods, sample sizes, per-field denominators, uncertainty, cost, and limitations. A live comparison requires image permission and an explicit budget; none was performed in this task.
+
+## Proposed 0.1.0a3 image policy
+
+PO/LISU prompt and both Pydantic reading schemas are unchanged. Sennen retains the same instructions except that "second is an enlarged crop" becomes "second is a crop", matching the no-upscaling image policy. Full-sheet and lower-crop input remain distinct views. This transformation change has a new cache identity. Synthetic tests verify structure and fidelity; a permitted live comparison is still required to evaluate scientific effects.

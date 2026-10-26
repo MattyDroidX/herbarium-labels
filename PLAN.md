@@ -693,3 +693,23 @@ The maintainer requested all code/interfaces in English. Proposed alpha `0.1.0a2
 Prompt instructions are now translated into English. Earlier statements that prompts were unchanged describe extraction and preceding increments only. Scientific safeguards and original-language examples are retained, but equivalent live quality has not been established. See docs/PROMPT_CHANGES.md and docs/MIGRATION.md.
 
 An offline `demo` generates/verifies synthetic JSON, Excel, PDF, ZIP, cache reuse, and separate full-sheet labels without a real provider. Current architecture/workflow diagrams and a detailed testing guide distinguish implemented behavior from the future roadmap. Forty-two offline tests passed in the isolated source proposal before final packaging checks. Only the maintainer applies/commits/pushes unless explicitly delegated.
+
+### Published baseline and reuse proposal — 2026-10-26
+
+The English API patch was applied by the maintainer. Version 0.1.0a2 was published to TestPyPI (downloaded wheel: 42 tests passed) and PyPI (fresh install and CLI help passed), as shown in the maintainer's session logs. Earlier "unapplied" or "no upload" entries describe historical preparation, not the current baseline.
+
+The next isolated proposal, 0.1.0a3, separates collection profiles from shared image preparation, Claude requests, cache/persistence, and reports. Both po-bryophytes and sennen use the same file pipeline; Sennen retains its full sheet and lower crop. Host field mappings, review translations, explicit client/options, and optional request contexts address reuse without coupling the library to a server or Taxa database fields. Metadata permits Pillow 11.3 compatibility while the primary lock retains Pillow 13. Dependency security and functional compatibility remain separate.
+
+This implements reusable contracts for two existing collections and Python-defined profiles. It does not implement generic segmentation, prompt-example retrieval, automatic authorship, canonical v2, native review import, or the remaining scientific evaluation roadmap. Only the maintainer applies and publishes this proposal.
+
+### Reuse follow-up after maintainer integration tests — 2026-10-26
+
+The preceding 0.1.0a3 reuse patch is now applied in the maintainer working tree. The maintainer reports 61 passing tests and three equivalent Taxa suggestion cases with Pillow 11.3, mapped shelfmark/cota fields, and Portuguese messages; see docs/EVIDENCE.md. No 0.1.0a3 publication is inferred.
+
+The next incremental proposal adds normal folder parameters independent of argparse, registered/installed collection profiles usable from CLI, translated report presentation, explicit historical-reading reuse with immutable source JSON and an acceptance ledger, per-call prices/model labels, and a shared retry default. It does not alter scientific prompts/schemas, perform real-folder migration, implement attribution/retrieval, or remove the remaining scientific roadmap. Only the maintainer applies, commits, or publishes.
+
+### Final 0.1.0a3 release preparation — 2026-10-26
+
+The maintainer independently verified all six reuse contracts, including an installed external profile and a copied six-photo historical batch with simulated request counting and byte-preserved old JSON. Their original data remained untouched; see docs/EVIDENCE.md for the reported scope and optional-SDK skip/rerun detail.
+
+A final isolated polish corrects stale cache-release wording, states price precedence explicitly with a regression, documents the legacy transcricao output location, and supplies release-oriented install/publication instructions. The release target stays 0.1.0a3. Preparation-time PyPI/TestPyPI metadata still listed 0.1.0a2; no new publication is claimed. Only the maintainer applies/commits/pushes/tags/publishes. The broader scientific roadmap is unchanged.

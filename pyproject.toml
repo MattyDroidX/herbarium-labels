@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "herbarium-labels"
-version = "0.1.0a2"
+version = "0.1.0a3"
 description = "Botanical label transcription and documented historical handwriting profiles"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
 ]
-dependencies = ["Pillow>=13,<14", "pydantic>=2.11,<3"]
+dependencies = ["Pillow>=11.3,<14", "pydantic>=2.11,<3"]
 
 [project.optional-dependencies]
 claude = ["anthropic>=1.17,<2"]
@@ -30,7 +30,11 @@ heif = ["pillow-heif>=1.1.1,<2"]
 all = ["anthropic>=1.17,<2", "openpyxl>=3.1.5,<4", "reportlab>=4.4,<5", "pillow-heif>=1.1.1,<2"]
 
 [project.scripts]
-herbarium-labels = "herbarium_labels.bryophytes:main"
+herbarium-labels = "herbarium_labels.cli:main"
+
+[project.entry-points."herbarium_labels.profiles"]
+po-bryophytes = "herbarium_labels.profiles:po_bryophytes_profile"
+sennen = "herbarium_labels.profiles:sennen_profile"
 
 [project.urls]
 Repository = "https://github.com/MattyDroidX/herbarium-labels"

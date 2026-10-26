@@ -1,69 +1,41 @@
 # Development handoff
 
-Updated: 2026-10-25. Version: local alpha `0.1.0a2`. This document distinguishes the working tree from the remaining unapplied release proposal.
+Updated: 2026-10-26. Published baseline: `0.1.0a2`. Next proposal: `0.1.0a3`.
 
-## Maintainer intent and control
+## Maintainer control
 
-Share a useful open library built from research workflows, complementary to Hespi. Research use and acceptance by researchers were reported by the maintainer; preserve that evidence and its limits. English documentation is required for international reuse.
+Only the maintainer applies repository changes, commits, tags, pushes, or publishes unless explicitly delegated. The maintainer applied the preceding reuse patch and reported 61 passing tests plus three equivalent Taxa cases. The maintainer has now applied the folder/plugin/localization/acceptance follow-up and independently checked all six integration areas. The final documentation/price-precedence polish is an isolated incremental proposal. Never modify the private Taxa application, databases, or deployment to prepare this package.
 
-The selected source destination is `MattyDroidX/herbarium-labels`; the SSH remote was configured at the maintainer's request. The intended package route is TestPyPI followed by PyPI.
+## Published baseline
 
-**Only the maintainer applies changes, commits, or pushes unless explicitly delegated.** This instruction also covers repository patch application. After this restriction was given, remaining edits/builds were prepared in a temporary review copy. Do not modify the working tree or Git state to finish the proposal without authorization. No commit, push, tag, or package upload has been made by the assistant. SSH access is unnecessary for preparation when the maintainer handles remote operations.
+The maintainer applied the English API patch, pushed tag `v0.1.0a2`, published to TestPyPI, downloaded its wheel into a clean environment, and reported 42 passing offline tests. They then triggered PyPI publication, installed `herbarium-labels[all]==0.1.0a2` in a fresh environment, and verified CLI help. These facts are recorded from the session logs; no unsupported assertion is made about every remote CI matrix job.
 
-## Provenance and current implementation
+## Reuse proposal
 
-See `NOTICE.md` for original TSennen/Taxa source references and hashes. The private application, deployments, databases, uploads, backups, and research outputs must remain separate. Personal workstation paths are not required in public documentation.
+- Shared `imaging.py`, `provider.py`, `pipeline.py`, `profiles.py`, and `pricing.py`; public `TranscriptionOptions`, `TranscriptionProfile`, `read_image`, `TranscriptionError`.
+- Both built-in profiles work through cached JSON and offline Excel/PDF/ZIP; the CLI accepts `--profile`. Scientific contracts remain collection-specific.
+- Sennen suggestions map canonical fields to host fields and accept complete host-owned review translations. The mixed-language default is corrected.
+- No upscaling; Sennen retains the full sheet plus lower crop. No implicit global semaphore or per-user request history. The compatibility rate helper requires a host callback.
+- Missing-key/provider/image/incomplete errors have a public exception; injected clients remain caller-owned. File-pipeline clients close after use.
+- Pillow compatibility floor is 11.3; the recommended hashed lock remains 13. See dependency limits in docs/INTEGRATION.md.
+- Actions use verified upstream commit SHAs; Dependabot proposes updates. Obsolete review patch removed; maintenance records are excluded from source distributions.
 
-- `src/herbarium_labels/bryophytes.py`: `transcribe`, `report`, `batch`, `demo`; Claude/Pydantic, per-image JSON, Excel, optional PDF, ZIP.
-- `src/herbarium_labels/sennen.py`: full sheet plus lower crop, multiple labels, structured fields, advisory suggestions; no database writes or automatic human approval.
-- Environment key/model/prices; unknown cost without configured tariffs. Optional HEIF dependency, rotation/path/collision checks, atomic JSON.
-- `catalog.py`: sources, people, hand samples, and attributions with reference/evidence checks.
-- `library/`: catalogue/schema and four draft people, without invented roles, aliases, samples, or confirmed attributions.
-- Content/configuration cache checks before requests; incompatible/legacy JSON requires a fresh output directory while remaining readable by reports.
-- Per-task results and central aggregation, known incomplete-response usage, six workers, exclusive transcription/batch output lock.
-- Runtime lock with hashes and all extras. Extraction originally preserved the prompts. The English API proposal now translates them deliberately; equivalent live scientific quality remains untested.
+## Folder integration follow-up
 
-## English release preparation
+The new incremental patch targets the already-applied 0.1.0a3 tree. It adds path-based folder APIs and artifact results, direct CLI delegation, registered/installed entry-point profiles, report messages and Portuguese synthetic examples, explicit historical-reading acceptance with a separate hash ledger, `sennen_suggestions` naming with a compatibility shim, explicit `TokenPrices`, options-derived model labels, and a common retry default of 2.
 
-Documentation, package description/docstrings, contributor instructions, release guide, source manifest, distribution checker/tests, and CI/publication workflows were prepared. The source tree and earlier local artifacts were modified before the maintainer-only application rule. Remaining translations, dependency correction, and refreshed manifests are supplied as an **unapplied patch** against that tree.
+The follow-up passed **83 offline tests** against source and the installed wheel on Linux/Python 3.12, with Pillow 13 and 11.3. Package metadata/content checks and translated-report visual inspection passed. No private application or collection folder was modified. See VALIDATION.md and docs/INTEGRATION.md.
 
-The review proposal changes Pillow from `>=11.3,<13` to `>=13,<14` after the advisory check reported 37 known vulnerability records for locked Pillow 12.3.0. It regenerates the runtime lock and locks the build backend with development tools. The preceding documentation-only proposal passed 29 offline tests on both source and installed wheel, metadata/content/license checks, and advisory scans with no known vulnerabilities reported for the current Linux/Python 3.12 dependency selection. Details are in `VALIDATION.md`; these changes must not be described as already applied to the maintainer's working tree.
+## Release polish
 
-## Verification and practical evidence
+The release target remains 0.1.0a3. The final incremental patch corrects the cache changelog wording, documents `prices` > `options.prices` > environment for both batch stages, adds a regression preserving the caller options, and shows legacy `transcricao/` output explicitly. README/install instructions and docs/PUBLISHING.md now describe the intended release version and complete TestPyPI-first workflow. Tests: 84 passed against source and installed wheels with Pillow 13 and 11.3; package/dependency checks passed. The maintainer's independent 83-test/Taxa/copied-batch evidence is recorded in docs/EVIDENCE.md.
 
-Original extraction: 14 synthetic/offline tests passed. Cache increment: 24 passed, including installed Anthropic 1.17.0 with mock HTTP transport. Release checks added five distribution regressions, for 29 tests before testing the remaining proposal.
+At the 2026-10-26 index check, both PyPI and TestPyPI still listed 0.1.0a2 and no 0.1.0a3 files. No new publication is claimed. Apply the final patch, review/commit/push the release tree, confirm CI, tag v0.1.0a3, validate the uploaded TestPyPI wheel, then trigger PyPI. The maintainer performs those actions.
 
-The real research workbook was inspected read-only: 549 records per sheet, 549 embedded images, literal text throughout, 306 records with uncertainty, no formula cells, valid local links. This is not a complete paleographic review and does not mean 306 errors. Private results are not packaged. Historical agreement/cost figures and limits remain in `docs/EVIDENCE.md`.
+## Before applying/releasing
 
-See `VALIDATION.md` for current local commands, package-installation checks, advisory findings, and outstanding remote checks. Do not invent successful CI or uploaded package URLs.
+Review the patch and validation record. Apply only to the matching baseline, rerun tests, inspect synthetic Sennen exports, and check installed-wheel behavior. New version is `0.1.0a3`; never overwrite the already-published tag/version. Strict cache identity remains the default. To reuse valid older JSON deliberately, choose `--accept-existing`; the acceptance ledger preserves original bytes and records whether historical image hashes were verifiable. Do not run it automatically on real data. Reports use JSON and do not import Excel-only edits. Check the host rate-policy migration before adopting.
 
-## Known limitations and future work
+Remaining work includes authorized live evaluation with a defined budget, long/Unicode report coverage, real HEIF samples, curated handwriting sources/examples, review import, and the broader roadmap in PLAN.md. No paid service call is included in this proposal.
 
-- No example retrieval, profile injection, automatic handwriting attribution, generic segmentation, native review events/import, or canonical v2 integration.
-- Filename-stem collisions remain blocked. Occurrence IDs, manifests, cross-occurrence deduplication, and automatic candidate revisions remain proposed.
-- Current interfaces are English: `bryophytes.py`, `transcribe`/`report`/`batch`/`demo`, English fields/reports/statuses. Legacy data is read in memory; old imports/commands are renamed. Preserve literal evidence in its source language. Review `docs/MIGRATION.md` and `docs/PROMPT_CHANGES.md`.
-- Use fresh output after image/configuration/codec changes. Legacy identity is not inferred. Stale locks require checking for an active process before removal; standalone reports do not acquire a write lock.
-- Lost responses may require repeat paid requests. Failure without usage cannot prove zero billing.
-- PDF Unicode/long-text behavior and complete visual report inspection remain pending. No layout change was introduced in the release documentation work.
-- Live provider/model execution and real HEIF decoding remain unverified in the extracted alpha; paid integration needs permitted images and a defined budget.
-- Remote matrix runs, TestPyPI/PyPI account setup, package-name availability, private reporting configuration, and publication still need actual execution.
-
-## Next steps
-
-1. Maintainer reviews/applies the remaining patch; confirm manifest hashes and rerun the documented checks on the applied tree.
-2. Maintainer reviews the public-file allowlist and actual Git author identity, then commits/pushes without overwriting existing remote history.
-3. Inspect actual Linux/Windows and Python-version CI results.
-4. Configure independent TestPyPI/PyPI Trusted Publishers for `publish.yml` and environments `testpypi`/`pypi`.
-5. Maintainer tags the reviewed version, publishes to TestPyPI, and verifies the uploaded wheel in a clean environment before triggering PyPI.
-6. Record real URLs, hashes, and results. Update the verified private reporting route.
-7. Continue the scientific roadmap: long/Unicode reports with visual inspection; permitted live integration; sourced, rights-cleared handwriting curation.
-
-Do not change the private research environment to prepare this library.
-
-## English API continuation
-
-The cumulative proposal now includes the preceding English-release preparation plus the English code/API migration. Apply only the latest cumulative patch against the unchanged working tree; do not apply it on top of the earlier patch. Version is `0.1.0a2`, schemas `0.2.0`; documentation filenames are English. No working-tree or Git mutation occurred during this continuation.
-
-New regression checks cover legacy alias conflicts, preserved literal/JSON bytes, English schemas/statuses/CLI, legacy locks, and the offline demo. The demo creates inspectable files and verification flags; it is not a paleographic accuracy experiment. Architecture/workflow SVG and Mermaid files are in `docs/diagrams/`; use `docs/TESTING.md` to reproduce the checks.
-
-Final local verification for this continuation: 42 tests passed against source and the installed English wheel in a fresh Python 3.12 environment. Console entry point and module import/version were checked; wheel/source metadata/allowlist checks passed. Short synthetic PDF and both SVG diagrams were rendered and visually inspected. Prompts were deliberately translated and require a separate authorized scientific comparison; no live call was performed.
+The separately hashed `requirements-compat.lock` selects Pillow 11.3 for functional compatibility checks; `requirements.lock` remains the recommended current environment.

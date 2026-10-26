@@ -1,37 +1,29 @@
 """Label transcription with Claude: readings become pending reviews, never direct edits."""
-import base64
-import io
 import os
 import re
-import threading
-import time
 import unicodedata
-from collections import defaultdict, deque
-from difflib import SequenceMatcher
 
-from PIL import Image, ImageOps
-try:
-    from pillow_heif import register_heif_opener
-except ImportError:
-    register_heif_opener = None
 from pydantic import BaseModel, ConfigDict, model_validator
+from .errors import TranscriptionError
+from .imaging import ImagePolicy, encoded, prepare_images
 from .legacy import LABEL_FIELDS, SHEET_FIELDS, rename_keys
+from .provider import TranscriptionOptions, read_image
 
-MODEL = os.environ.get('TRANSCRIPTION_MODEL', 'claude-haiku-5-5')
-MODEL_LABEL = {'claude-haiku-5-5':'Claude Haiku 5.5', 'claude-sonnet-5-5':'Claude Sonnet 5.5',
-               'claude-opus-5-5':'Claude Opus 5.5'}.get(MODEL, MODEL)
-RATE_LIMIT, RATE_WINDOW = 30, 600  # Per person: 30 photographs every 10 minutes.
+def _model_label(model):
+    return {'claude-haiku-5-5': 'Claude Haiku 5.5', 'claude-sonnet-5-5': 'Claude Sonnet 5.5',
+            'claude-opus-5-5': 'Claude Opus 5.5'}.get(model, model)
+
+
+def __getattr__(name):
+    # Compatibility attributes are resolved at access time, never at module import.
+    if name == 'MODEL':
+        return TranscriptionOptions().resolved_model
+    if name == 'MODEL_LABEL':
+        return _model_label(TranscriptionOptions().resolved_model)
+    raise AttributeError(name)
+
+
 ROMAN = {'I':1,'II':2,'III':3,'IV':4,'V':5,'VI':6,'VII':7,'VIII':8,'IX':9,'X':10,'XI':11,'XII':12}
-
-if register_heif_opener is not None:
-    register_heif_opener()
-_calls = defaultdict(deque)
-_calls_lock = threading.Lock()
-_slots = threading.BoundedSemaphore(2)  # The server sends at most two photographs at a time.
-
-
-class TranscriptionError(Exception):
-    pass
 
 
 class Label(BaseModel):
@@ -69,7 +61,7 @@ class SheetReading(BaseModel):
 
 
 PROMPT = """Transcribe the labels on this herbarium sheet from the F. Sennen collection at Herbário da Universidade do Porto.
-The first image is the full sheet; the second is an enlarged crop of its lower label region.
+The first image is the full sheet; the second is a crop of its lower label region.
 
 There are usually two labels:
 - A printed Sennen label ("Plantes d'Espagne — F. Sennen"): exsiccata number ("N.º ..."), scientific name with author, locality, altitude, and date.
@@ -82,69 +74,42 @@ Rules:
 - labels: one entry per label, with origin "Sennen", "Porto", or "other", and its complete literal_text with original line breaks. Keep separate labels separate."""
 
 
-def estimated_cost(model, input_tokens, output_tokens):
-    # Model-specific tariffs are supplied by the host, never guessed.
-    if model != MODEL:
+def estimated_cost(model, input_tokens, output_tokens, *, prices=None):
+    from .pricing import estimate_cost
+    if prices is None and model != TranscriptionOptions().resolved_model:
         return None
-    from .bryophytes import cost_text
-    value = cost_text(input_tokens, output_tokens)
-    return float(value.split()[0]) if value.endswith(' USD') else None
+    return estimate_cost(input_tokens, output_tokens, prices=prices, model=model)
 
 
 def enabled():
     return bool(os.environ.get('ANTHROPIC_API_KEY', '').strip())
 
 
-def check_rate(user_id):
-    now = time.monotonic()
-    with _calls_lock:
-        calls = _calls[user_id]
-        while calls and now - calls[0] > RATE_WINDOW:
-            calls.popleft()
-        if len(calls) >= RATE_LIMIT:
-            raise TranscriptionError('Transcription rate limit reached. Wait a few minutes and try again.')
-        calls.append(now)
+def check_rate(user_id, *, limiter=None):
+    """Compatibility hook: the host supplies any per-user rate policy."""
+    if limiter is None:
+        raise TranscriptionError('Supply a host-owned limiter when calling check_rate.')
+    limiter(user_id)
 
 
 def _jpeg(image, long_edge=1568):
-    image = image.copy()
-    scale = long_edge / max(image.size)
-    image = image.resize((max(1, round(image.width * scale)), max(1, round(image.height * scale))), Image.LANCZOS)
-    buffer = io.BytesIO()
-    image.save(buffer, 'JPEG', quality=92)
-    return {'type':'image', 'source':{'type':'base64', 'media_type':'image/jpeg',
-                                      'data':base64.standard_b64encode(buffer.getvalue()).decode()}}
+    return encoded(image, long_edge)
 
 
 def images(content):
-    """The sheet and an enlarged crop of its lower part, where the labels are."""
-    with Image.open(io.BytesIO(content)) as original:
-        if original.format in ('JPEG', 'MPO'):
-            original.draft('RGB', (3000, 3000))
-        sheet = ImageOps.exif_transpose(original).convert('RGB')
-    labels = sheet.crop((0, round(sheet.height * 0.6), sheet.width, sheet.height))
-    return [_jpeg(sheet), _jpeg(labels)]
+    """Full sheet and lower-label crop; neither view is upscaled."""
+    return prepare_images(content, ImagePolicy(lower_crop=0.6, draft_decode=True))
 
 
-def read_labels(content, client=None):
-    import anthropic
-    try:
-        blocks = images(content)
-    except (OSError, ValueError, Image.DecompressionBombError):
-        raise TranscriptionError('Could not prepare this image for transcription.') from None
-    client = client or anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'], timeout=120, max_retries=2)
-    if not _slots.acquire(timeout=60):
-        raise TranscriptionError('The transcription service is busy. Try again shortly.')
-    try:
-        response = client.messages.parse(model=MODEL, max_tokens=16000, output_format=SheetReading,
-            messages=[{'role':'user', 'content':blocks + [{'type':'text', 'text':PROMPT}]}])
-    except anthropic.APIError:
-        raise TranscriptionError('The transcription service did not respond. Try again later.') from None
-    finally:
-        _slots.release()
-    if response.stop_reason != 'end_turn' or response.parsed_output is None:
-        raise TranscriptionError('Could not obtain a complete reading of this image.')
-    return response.parsed_output, {'input_tokens':response.usage.input_tokens, 'output_tokens':response.usage.output_tokens}
+def read_labels(content, client=None, *, options=None, request_context=None):
+    return read_image(content, profile='sennen', client=client,
+                      options=options or TranscriptionOptions(),
+                      request_context=request_context)
+
+
+COLUMNS = [('filename', 'Filename')] + [
+    (name, name.replace('_', ' ').capitalize()) for name in SheetReading.model_fields
+]
 
 
 def _norm(value):
@@ -167,29 +132,9 @@ def _shelfmark(value):
     return '/'.join(re.findall(r'\d+', value or ''))
 
 
-def _doubts(reading, *words):
-    found = [d for d in reading.uncertainties if any(w in _norm(d) for w in words)]
-    return ('\n\nUncertainties flagged by the model:\n- ' + '\n- '.join(found)) if found else ''
-
-
-def suggestions(item, reading, filename):
-    """(field, value, review text) for each reading that differs from the record."""
-    source = f'Automatic suggestion ({MODEL_LABEL}) from image {filename}. Check the image before accepting.'
-    result = []
-    if not (item.get('transcription') or '').strip():
-        text = '\n\n'.join(f'[{label.origin}]\n{label.literal_text.strip()}' for label in reading.labels)
-        if text.strip():
-            result.append(('transcription', text, source + ' Literal transcription das labels.' + _doubts(reading, '')))
-    read_shelfmark = _shelfmark(reading.shelfmark)
-    if read_shelfmark and read_shelfmark != _shelfmark(item.get('shelfmark')):
-        result.append(('shelfmark', read_shelfmark, f"{source} Current shelfmark: «{item.get('shelfmark') or '—'}». Reading: «{reading.shelfmark}»." + _doubts(reading, 'shelfmark', 'circle')))
-    read_exs, current_exs = re.sub(r'\D', '', reading.sennen_exsiccata_number), (item.get('exsiccata_number') or '').strip()
-    if read_exs and read_exs != current_exs:
-        result.append(('exsiccata_number', read_exs, f"{source} Current exsiccata number: «{current_exs or '—'}». Sennen label reading: «{reading.sennen_exsiccata_number}»." + _doubts(reading, 'exsiccata', 'collection_number')))
-    read_date, current_date = _date(reading.collection_date), item.get('collection_date') or ''
-    if reading.collection_date and read_date and (not current_date or (_date(current_date) and read_date != _date(current_date))):
-        result.append(('collection_date', reading.collection_date, f"{source} Current date: «{current_date or '—'}». Reading: «{reading.collection_date}»." + _doubts(reading, 'date')))
-    current_locality = item.get('original_locality') or ''
-    if reading.locality and SequenceMatcher(None, _norm(reading.locality), _norm(current_locality)).ratio() < 0.9:
-        result.append(('original_locality', reading.locality, f"{source} Current original locality: «{current_locality or '—'}». Reading: «{reading.locality}»." + _doubts(reading, 'local', 'loc')))
-    return result
+def suggestions(item, reading, filename, *, field_map=None, messages=None, model_label=None, options=None):
+    """Return host-mapped (field, value, review text) tuples without editing records."""
+    from .sennen_suggestions import build_suggestions
+    return build_suggestions(item, reading, filename, field_map=field_map,
+                             messages=messages, model_label=model_label if model_label is not None else
+                             _model_label((options or TranscriptionOptions()).resolved_model))

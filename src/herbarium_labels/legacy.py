@@ -45,6 +45,7 @@ def normalize_record(value):
     result = rename_keys(value, ENVELOPE_FIELDS)
     if result.get('schema_version') not in (None, '0.1.0', RECORD_SCHEMA_VERSION):
         raise ValueError('Unsupported transcription record schema version.')
-    result['reading'] = rename_keys(result['reading'], BRYOPHYTE_FIELDS)
+    if result.get('profile', 'po-bryophytes') == 'po-bryophytes':
+        result['reading'] = rename_keys(result['reading'], BRYOPHYTE_FIELDS)
     result['schema_version'] = RECORD_SCHEMA_VERSION
     return result

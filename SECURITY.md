@@ -6,4 +6,6 @@ The library is not an authentication server. Host applications implement authori
 
 Before release, review the public-file allowlist, history, dependency locks, dependency advisories, and secrets in both the source tree and built distributions. `tools/check_dist.py` performs structural checks and a limited pattern scan; it is not an external audit or a complete secret detector. No external security audit has been performed.
 
-A private vulnerability-reporting channel has not yet been verified for the selected MattyDroidX/herbarium-labels repository. Enable GitHub Private Vulnerability Reporting once the repository exists and update this document with the actual route. Do not post sensitive details in public issues while a private channel is unavailable. No contact address is invented here.
+Use the repository's private vulnerability-reporting channel when enabled. Do not post credentials or sensitive research data in public issues. Maintainers should keep the reporting route visible in the repository Security tab.
+
+The primary hashed environment uses Pillow 13. The lower Pillow 11.3 compatibility floor supports existing hosts; it does not imply that old image decoders have current security fixes. Keep application dependencies audited and current. The separate compatibility lock/job exercises synthetic inputs only.

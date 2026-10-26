@@ -8,9 +8,9 @@ Before release-related work, install `requirements-dev.lock` with `--require-has
 
 ## Propose a change
 
-Explain the use case, current behavior, and expected result. Keep changes small. Use the English commands/models and preserve legacy JSON reading, source-language evidence, and full-sheet Sennen processing. Consult docs/MIGRATION.md before changing a public interface. Changes to prompts or schemas require justification, a changelog entry, and evaluation of their effects. Read [AGENTS.md](AGENTS.md) for repository-specific invariants.
+Explain the use case, current behavior, and expected result. Keep changes small. Use the English commands/models and preserve legacy JSON reading, source-language evidence, and full-sheet Sennen processing. Consult docs/MIGRATION.md before changing a public interface. Changes to prompts or schemas require justification, a changelog entry, and evaluation of their effects. Read [AGENTS.md](https://github.com/MattyDroidX/herbarium-labels/blob/main/AGENTS.md) for repository-specific invariants.
 
-Use concise imperative commit subjects, such as `Validate cache identity before transcription`. This is guidance for new commits: the local repository has no established commit-history convention yet.
+Use concise imperative commit subjects, such as `Validate cache identity before transcription`. This is guidance for new commits: the current history has no established commit-message convention.
 
 A pull request should describe the behavior change, relevant issue if one exists, tests run and their results, and known limitations. Include before/after report samples when layout changes; use synthetic data and document visual inspection. Update `CHANGELOG.md`, `VALIDATION.md`, and `HANDOFF.md` where relevant.
 

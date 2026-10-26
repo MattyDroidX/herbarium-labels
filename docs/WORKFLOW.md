@@ -1,45 +1,40 @@
-# Workflow diagram
+# Workflow overview
 
-[Open the standalone SVG](diagrams/workflow.svg) or edit the [Mermaid source](diagrams/workflow.mmd). This is the implemented delivery workflow, including failure stops; it does not imply an automated review application.
+This describes the proposed 0.1.0a3 source. The published 0.1.0a2 uses independent readers. [Open the SVG](diagrams/workflow.svg) or edit the [Mermaid source](diagrams/workflow.mmd).
 
 ![Workflow overview](diagrams/workflow.svg)
 
 ```mermaid
 flowchart TD
-    Start["Choose command"] --> Command{"demo / report / transcribe / batch?"}
-    Command -- demo --> Fixture["Create synthetic images; use simulated provider"]
-    Fixture --> Validate["Validate images and duplicate filename stems"]
-    Command -- "transcribe or batch" --> Validate
-    Command -- report --> Load["Read stored English or legacy JSON; no API"]
-    Validate --> Lock["Acquire exclusive output lock"]
-    Lock --> Cache{"Existing selected JSON matches image/config?"}
-    Cache -- incompatible --> Stop["Stop; preserve previous work and choose fresh output"]
-    Cache -- reusable --> Reuse["Reuse without provider request"]
-    Cache -- missing --> Request["Request structured reading; bounded SDK retries"]
-    Request --> Complete{"Complete and valid response?"}
-    Complete -- no --> Failure["Record failure in summary; do not persist incomplete reading"]
-    Complete -- yes --> Save["Save English JSON atomically"]
-    Save --> Mode{"Batch delivery?"}
-    Reuse --> Mode
-    Failure --> Mode
-    Mode -- no --> Done["Return transcription summary; inspect failures"]
-    Mode -- yes --> All{"Every input has a reading?"}
-    All -- no --> Abort["Stop incomplete batch before reports/ZIP"]
-    All -- yes --> Reports["Build English Excel and optional PDF"]
-    Load --> Reports
-    Reports --> Archive{"Batch?"}
-    Archive -- yes --> ZIP["Create temporary ZIP; check integrity; replace archive"]
-    Archive -- no --> Review["Inspect original, literal text, uncertainty, and links"]
-    ZIP --> Review
-    Review --> Human["Human decision; no automatic approval/import"]
+    Start["Choose profile and command"] --> Mode{"demo / report / transcribe / batch?"}
+    Mode -- demo --> Demo["Synthetic images and simulated provider"]
+    Mode -- report --> Stored["Load JSON with matching profile; no API"]
+    Mode -- "transcribe / batch" --> Lock["Validate inputs and acquire output lock"]
+    Demo --> Lock
+    Lock --> Cache{"Strict match or explicit historical acceptance?"}
+    Cache -- conflict --> Stop["Stop; preserve originals, JSON and human corrections"]
+    Cache -- "explicit acceptance" --> Accepted["Separate hash ledger; original JSON unchanged"]
+    Accepted --> Reuse
+    Cache -- reusable --> Reuse["Reuse without request"]
+    Cache -- missing --> Prepare["Shared image preparation; Sennen adds lower crop"]
+    Prepare --> Request["Structured request with explicit options/client"]
+    Request --> Valid{"Complete and valid reading?"}
+    Valid -- no --> Failure["Aggregate known usage/failure; no incomplete JSON"]
+    Valid -- yes --> Save["Atomic profile-tagged JSON"]
+    Save --> Delivery{"Batch with every input complete?"}
+    Reuse --> Delivery
+    Failure --> Delivery
+    Delivery -- incomplete --> Stop
+    Delivery -- transcribe --> Summary["Return totals; CLI failures exit 1"]
+    Delivery -- complete --> Reports["Shared Excel and optional PDF; checked ZIP"]
+    Stored --> Reports
+    Reports --> Human["Human review outside the library"]
 ```
 
-- **`transcribe`:** validate selected inputs/cache, request missing readings, validate/persist complete results, and return usage/failure totals. Inspect the printed failures: this command currently does not guarantee a nonzero exit status for every per-image provider failure.
-- **`report`:** read existing English/legacy JSON, validate image identity when recorded, and generate English reports without a provider call. Standalone reports do not acquire the transcription lock; avoid concurrent writers.
-- **`batch`:** keep the output lock throughout transcription and delivery. Require readings for all inputs before reports/ZIP. Preserve an earlier archive if the new ZIP integrity check fails.
-- **`demo`:** create a fresh synthetic input directory and mock provider, exercise batch/resume plus the Sennen Python route, and verify the generated files without network or paid usage.
-- **Sennen Python route:** return `SheetReading` and usage for the full sheet plus crop. Its semaphore bounds concurrent calls. The host must explicitly invoke any per-user rate helper and perform human approval; these are not automatically provided by the CLI.
+Profiles select the scientific prompt, schema, image views, and report columns. Both built-ins share image preparation, Claude requests, cache/persistence, and offline delivery. Sennen retains the full sheet and lower crop without upscaling. Registered and installed entry-point profiles use the same contract from Python and CLI. Folder APIs receive paths and ordinary keyword parameters; CLI adapters delegate to them.
 
-Existing JSON is not replaced just because a new model/schema/prompt is requested. Incompatible cache stops the run and asks for a new output directory. Failed/incomplete responses are not promoted to valid readings. A lost paid response before persistence may still require a repeated request.
+The host owns authentication, optional request concurrency/user limits, field mappings, review-language rendering, and database decisions. An injected client remains caller-owned. Catalogue validation stays independent and does not identify writers or inject examples into prompts.
 
-The final human step is inspection of originals, literal text, field interpretation, uncertainty, and links. An Excel checkbox does not itself register an immutable review event or approve handwriting attribution. See [TESTING.md](TESTING.md) for reproducible checks and [MIGRATION.md](MIGRATION.md) for interface changes.
+Cache checks precede requests. Strict conflicts stop; explicit historical acceptance records hashes separately while preserving original JSON; incomplete readings are not saved. The CLI exits nonzero for transcription failures. Batch requires complete input coverage before reports/ZIP. Standalone reports require no competing writer. See [integration](INTEGRATION.md), [testing](TESTING.md), and the remaining [roadmap](https://github.com/MattyDroidX/herbarium-labels/blob/main/PLAN.md).
+
+The host can supply report translations as well as review-suggestion messages. Explicit acceptance stores historical provenance separately from new cache identity; it does not establish scientific approval. See [continuing older folders](INTEGRATION.md#continue-an-older-reviewed-folder).

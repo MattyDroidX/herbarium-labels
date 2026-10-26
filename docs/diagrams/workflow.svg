@@ -1,85 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="1030" viewBox="0 0 1560 1030" role="img" aria-labelledby="title desc">
-<title id="title">Workflow overview</title>
-<desc id="desc">Main transcription and batch path • report can start from stored JSON • demo replaces paid requests with fixtures</desc>
-<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#68755e"/></marker></defs>
-<rect width="1560" height="1030" fill="#f7f8f4"/>
-<text x="50" y="65" font-family="DejaVu Sans,Arial,sans-serif" font-size="32" font-weight="bold" fill="#26322c">Workflow overview</text>
-<text x="50" y="106" font-family="DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="normal" fill="#26322c">Main transcription and batch path • report can start from stored JSON • demo replaces paid requests with fixtures</text>
-<polyline points="370,237 440,237" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="440,237 426.0,231.0 426.0,243.0" fill="#68755e"/>
-<polyline points="760,237 830,237" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="830,237 816.0,231.0 816.0,243.0" fill="#68755e"/>
-<polyline points="1120,237 1190,237" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="1190,237 1176.0,231.0 1176.0,243.0" fill="#68755e"/>
-<text x="1135" y="215" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="normal" fill="#536347">valid</text>
-<polyline points="975,305 975,390" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="975,390 981.0,376.0 969.0,376.0" fill="#68755e"/>
-<text x="990" y="350" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="normal" fill="#536347">missing</text>
-<polyline points="1120,268 1150,268 1150,450 1190,450" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="1190,450 1176.0,444.0 1176.0,456.0" fill="#68755e"/>
-<text x="1135" y="365" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="normal" fill="#536347">mismatch</text>
-<polyline points="830,457 760,457" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="760,457 774.0,463.0 774.0,451.0" fill="#68755e"/>
-<polyline points="440,457 370,457" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="370,457 384.0,463.0 384.0,451.0" fill="#68755e"/>
-<polyline points="210,525 210,680" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="210,680 216.0,666.0 204.0,666.0" fill="#68755e"/>
-<text x="225" y="580" font-family="DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="normal" fill="#536347">batch only</text>
-<polyline points="1510,237 1535,237 1535,600 210,600 210,680" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="210,680 216.0,666.0 204.0,666.0" fill="#68755e"/>
-<polyline points="370,747 440,747" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="440,747 426.0,741.0 426.0,753.0" fill="#68755e"/>
-<polyline points="760,747 830,747" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="830,747 816.0,741.0 816.0,753.0" fill="#68755e"/>
-<polyline points="1120,747 1190,747" fill="none" stroke="#68755e" stroke-width="3"/>
-<polygon points="1190,747 1176.0,741.0 1176.0,753.0" fill="#68755e"/>
-<rect x="50" y="170" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="70" y="208" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Validate input</text>
-<text x="70" y="242" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Images and duplicate stems</text>
-<text x="70" y="269" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Originals remain unchanged</text>
-<rect x="440" y="170" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="460" y="208" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Acquire output lock</text>
-<text x="460" y="242" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Exclusive transcription/batch</text>
-<text x="460" y="269" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Preflight selected results</text>
-<rect x="830" y="170" width="290" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="850" y="208" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Check cache</text>
-<text x="850" y="242" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Image/config hashes</text>
-<text x="850" y="269" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Complete valid JSON</text>
-<rect x="1190" y="170" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="1210" y="208" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Reuse valid reading</text>
-<text x="1210" y="242" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">No provider request</text>
-<text x="1210" y="269" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Human corrections preserved</text>
-<rect x="1190" y="390" width="320" height="135" rx="16" fill="#f8e6df" stroke="#9cab92" stroke-width="2"/>
-<text x="1210" y="428" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Stop on conflict</text>
-<text x="1210" y="462" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Keep old result unchanged</text>
-<text x="1210" y="489" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Choose a fresh output</text>
-<rect x="830" y="390" width="290" height="135" rx="16" fill="#e7efe2" stroke="#9cab92" stroke-width="2"/>
-<text x="850" y="428" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Request reading</text>
-<text x="850" y="462" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Live provider or demo mock</text>
-<text x="850" y="489" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Save complete outputs only</text>
-<rect x="440" y="390" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="460" y="428" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Validate response</text>
-<text x="460" y="462" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">English Pydantic schema</text>
-<text x="460" y="489" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Preserve literal and uncertainty</text>
-<rect x="50" y="390" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="70" y="428" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Persist JSON</text>
-<text x="70" y="462" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Temporary file + atomic write</text>
-<text x="70" y="489" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">transcribe ends with summary</text>
-<rect x="50" y="680" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="70" y="718" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Require full batch</text>
-<text x="70" y="752" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Missing reading stops delivery</text>
-<text x="70" y="779" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">No partial ZIP by default</text>
-<rect x="440" y="680" width="320" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="460" y="718" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Generate reports</text>
-<text x="460" y="752" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">English Excel and PDF</text>
-<text x="460" y="779" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">No API needed for report</text>
-<rect x="830" y="680" width="290" height="135" rx="16" fill="#ffffff" stroke="#9cab92" stroke-width="2"/>
-<text x="850" y="718" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Validate ZIP</text>
-<text x="850" y="752" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Relative paths and images</text>
-<text x="850" y="779" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Check before replacement</text>
-<rect x="1190" y="680" width="320" height="135" rx="16" fill="#e7efe2" stroke="#9cab92" stroke-width="2"/>
-<text x="1210" y="718" font-family="DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="bold" fill="#26322c">Human inspection</text>
-<text x="1210" y="752" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Originals, text, uncertainty</text>
-<text x="1210" y="779" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Review remains external</text>
-<text x="50" y="974" font-family="DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="normal" fill="#26322c">Failures appear in the summary; inspect them. batch refuses incomplete delivery. No automatic human approval.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="750" viewBox="0 0 1300 750" role="img" aria-labelledby="title desc"><title id="title">Workflow overview</title><desc id="desc">Proposed 0.1.0a3: explicit collection contracts and a shared delivery pipeline</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#61756b"/></marker></defs>
+<rect width="1300" height="750" fill="#faf8f2"/>
+<text x="40" y="50" font-size="30" font-weight="bold" fill="#263d31" font-family="DejaVu Sans,Arial,sans-serif">Workflow overview</text>
+<text x="40" y="82" font-size="17" fill="#4d6257" font-family="DejaVu Sans,Arial,sans-serif">Proposed 0.1.0a3: explicit collection contracts and a shared delivery pipeline</text>
+<path d="M 410 172.5 L 455 172.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="455,172.5 443.0,177.5 443.0,167.5" fill="#61756b"/>
+<path d="M 825 172.5 L 870 172.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="870,172.5 858.0,177.5 858.0,167.5" fill="#61756b"/>
+<path d="M 1055.0 215 L 1055.0 300" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="1055.0,300 1050.0,288.0 1060.0,288.0" fill="#61756b"/>
+<path d="M 870 342.5 L 825 342.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="825,342.5 837.0,337.5 837.0,347.5" fill="#61756b"/>
+<path d="M 455 342.5 L 410 342.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="410,342.5 422.0,337.5 422.0,347.5" fill="#61756b"/>
+<path d="M 225.0 385 L 225.0 475" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="225.0,475 220.0,463.0 230.0,463.0" fill="#61756b"/>
+<path d="M 410 517.5 L 455 517.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="455,517.5 443.0,522.5 443.0,512.5" fill="#61756b"/>
+<path d="M 825 517.5 L 870 517.5" fill="none" stroke="#61756b" stroke-width="2" />
+<polygon points="870,517.5 858.0,522.5 858.0,512.5" fill="#61756b"/>
+<rect x="40" y="130" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="225.0" y="159" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Choose command and profile</text>
+<text x="225.0" y="182" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">PO/LISU or Sennen; originals unchanged</text>
+<rect x="455" y="130" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="640.0" y="159" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Cache + explicit historical acceptance</text>
+<text x="640.0" y="182" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">hash checks / locks / original JSON kept</text>
+<rect x="870" y="130" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="1055.0" y="159" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Shared image preparation</text>
+<text x="1055.0" y="182" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Sennen: full sheet + lower crop</text>
+<rect x="870" y="300" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="1055.0" y="329" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Request structured reading</text>
+<text x="1055.0" y="352" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">explicit model/client; host owns limits</text>
+<rect x="455" y="300" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="640.0" y="329" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Validate and aggregate</text>
+<text x="640.0" y="352" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">complete: atomic JSON; failure: usage only</text>
+<rect x="40" y="300" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="225.0" y="329" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Complete batch gate</text>
+<text x="225.0" y="352" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">refuse reports/ZIP if inputs are missing</text>
+<rect x="40" y="475" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="225.0" y="504" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Offline report or batch delivery</text>
+<text x="225.0" y="527" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Excel / optional PDF / verified ZIP</text>
+<rect x="455" y="475" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="640.0" y="504" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Host field mapping and review text</text>
+<text x="640.0" y="527" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">canonical data stays independent</text>
+<rect x="870" y="475" width="370" height="85" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="1055.0" y="504" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">Human review</text>
+<text x="1055.0" y="527" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">inspect image, literal text and uncertainty</text>
+<rect x="40" y="630" width="1200" height="65" rx="12" fill="#edf3ea" stroke="#76967d" stroke-width="1.5"/>
+<text x="640.0" y="659" text-anchor="middle" font-size="17" font-family="DejaVu Sans,Arial,sans-serif" fill="#263d31">demo: synthetic provider; transcribe failures: CLI exit 1; conflicts: preserve prior work</text>
 </svg>
