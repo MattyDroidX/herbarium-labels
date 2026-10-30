@@ -54,7 +54,9 @@
   "review": {
     "sennen": {
       "source": "Automatic suggestion ({model}) from image {filename}. Check the image before accepting.",
+      "source_agent": "Automatic suggestion by {agent} ({model}), requested by {requester}, from image {filename}. Check the image before accepting.",
       "transcription": "Literal transcription of the labels.",
+      "associated_labels": "Labels that came with another specimen or collection.",
       "shelfmark": "Current shelfmark: «{current}». Reading: «{reading}».",
       "exsiccata_number": "Current exsiccata number: «{current}». Sennen label reading: «{reading}».",
       "collection_date": "Current date: «{current}». Reading: «{reading}».",

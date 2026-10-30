@@ -18,9 +18,13 @@ class TranscriptionProfile:
     schema: type[BaseModel]
     columns: tuple[tuple[str | None, str], ...]
     images: ImagePolicy = field(default_factory=ImagePolicy)
+    # Label origins that belong to the specimen itself; other labels (exchange, determination slips, labels sent
+    # with another specimen) are suggested as associated labels. Empty: every label is the specimen's own.
+    own_label_origins: tuple[str, ...] = ()
 
     def __post_init__(self):
         object.__setattr__(self, 'columns', tuple(tuple(column) for column in self.columns))
+        object.__setattr__(self, 'own_label_origins', tuple(str(origin) for origin in self.own_label_origins))
         if not re.fullmatch(r'[a-z][a-z0-9-]*', self.name):
             raise ValueError('Profile names must use lowercase words separated by hyphens.')
         if not self.prompt.strip() or not issubclass(self.schema, BaseModel):
@@ -50,7 +54,8 @@ def po_bryophytes_profile():
 def sennen_profile():
     from . import sennen
     return TranscriptionProfile('sennen', sennen.PROMPT, sennen.SheetReading,
-                                tuple(sennen.COLUMNS), ImagePolicy(lower_crop=0.6, draft_decode=True))
+                                tuple(sennen.COLUMNS), ImagePolicy(lower_crop=0.6, draft_decode=True),
+                                own_label_origins=('Sennen', 'Porto'))
 
 
 _BUILTINS = {'po-bryophytes': po_bryophytes_profile, 'sennen': sennen_profile}

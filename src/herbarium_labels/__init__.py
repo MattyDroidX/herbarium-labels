@@ -1,5 +1,5 @@
 """Botanical label transcription derived from the TSennen/Taxa workflows."""
-__version__ = "0.1.0a4"
+__version__ = "0.1.0a5"
 
 from .errors import TranscriptionError
 from .profiles import TranscriptionProfile, get_profile, register_profile, list_profiles

@@ -132,9 +132,12 @@ def _shelfmark(value):
     return '/'.join(re.findall(r'\d+', value or ''))
 
 
-def suggestions(item, reading, filename, *, field_map=None, messages=None, model_label=None, options=None):
-    """Return host-mapped (field, value, review text) tuples without editing records."""
-    from .sennen_suggestions import build_suggestions
-    return build_suggestions(item, reading, filename, field_map=field_map,
-                             messages=messages, model_label=model_label if model_label is not None else
-                             _model_label((options or TranscriptionOptions()).resolved_model))
+def suggestions(item, reading, filename, *, field_map=None, messages=None, model_label=None, options=None,
+                provenance=None, own_label_origins=None, records=False):
+    """Host-mapped (field, value, review text) tuples, or Suggestion records with records=True; never edits records."""
+    from .sennen_suggestions import build_suggestion_records
+    built = build_suggestion_records(item, reading, filename, field_map=field_map, messages=messages,
+                                     model_label=model_label if model_label is not None else
+                                     _model_label((options or TranscriptionOptions()).resolved_model),
+                                     provenance=provenance, own_label_origins=own_label_origins)
+    return built if records else [(s.field, s.value, s.text) for s in built]

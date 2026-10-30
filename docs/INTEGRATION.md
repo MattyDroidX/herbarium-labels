@@ -26,20 +26,31 @@ Supported canonical keys are `transcription`, `shelfmark`, `exsiccata_number`, `
 ## Taxa integration with Portuguese notes and review messages
 
 ```python
-from herbarium_labels import TranscriptionOptions, load_messages, read_image
+from herbarium_labels import TranscriptionOptions, get_profile, load_messages, read_image
 from herbarium_labels.sennen import suggestions
 
 options = TranscriptionOptions(model=selected_model, notes_language="pt")
 reading, usage = read_image(
     image_bytes, profile="sennen", client=existing_client, options=options,
 )
-rows = suggestions(
+records = suggestions(
     record, reading, filename,
     options=options,
     messages=load_messages("pt", kind="review"),
-    field_map={"shelfmark": "cota"},
+    field_map={"shelfmark": "cota", "associated_labels": "later_annotations"},
+    own_label_origins=get_profile("sennen").own_label_origins,
+    provenance={"agent": ai_account_name, "requester": person_name},
+    records=True,
 )
+for r in records:
+    create_pending_review(field=r.field, value=r.value, text=r.text, author=ai_account, details=r.provenance)
 ```
+
+`own_label_origins` sends labels of other origins (labels that came with another specimen) to the canonical
+`associated_labels` field, mapped here to the host's own field. `provenance` names the account that signs the
+suggestion and the person who asked; with both, the `source_agent` message is used ("Sugestão automática de …,
+pedida por …"). Records keep the provenance as structured data for the host's audit trail; the tuple form
+(`records=False`, the default) is unchanged.
 
 The injected client remains caller-owned. This changes only generated uncertainty notes and review presentation; source text is not translated. Adjust templates with a mapping/callback if the host needs its existing exact wording.
 

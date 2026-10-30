@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased — 0.1.0a4
+## Unreleased — 0.1.0a5
+
+- Label routing by origin: `TranscriptionProfile.own_label_origins` declares which label origins belong to the
+  specimen (Sennen profile: `Sennen`, `Porto`). With `own_label_origins=...`, Sennen suggestions put the other labels
+  (exchange labels, labels sent with another specimen) in the new canonical field `associated_labels`, mappable with
+  `field_map`. The default keeps the 0.1.0a4 behaviour and emits a `FutureWarning` when a reading has labels of other
+  origins: **from 0.1.0a6 the profile's origins become the default**; pass `own_label_origins=()` to keep every label
+  in the transcription.
+- Structured provenance: `build_suggestion_records()` / `suggestions(..., records=True)` return `Suggestion` records
+  with a `provenance` mapping (model, image, and whatever the host adds: agent, requester, hashes). With an agent and a
+  requester the new `source_agent` message names both. The tuple API is unchanged.
+- Catalogues: `source_agent` and `associated_labels` in English, Portuguese and Spanish.
+- Not in the cache identity: routing and provenance act after the reading, so 0.1.0a4 readings stay reusable.
+
+## 0.1.0a4 — 2026-10-26
 
 - Retain the maintainer-supplied Taxa wording in Portuguese Sennen reviews (photograph/source confirmation and the `exsiccata_number` caption/Sennen reading phrase), with an exact rendered-text regression.
 
